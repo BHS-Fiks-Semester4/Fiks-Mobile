@@ -1,4 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:crypto/crypto.dart';
+import 'HomePage.dart';
 
 void main() {
   runApp(const MainApp());
@@ -11,6 +14,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       home: LoginPage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -23,7 +27,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  TextEditingController _usernameController = TextEditingController();
+  bool Secure = true;
+  TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 
   @override
@@ -32,45 +37,76 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         title: const Text('Login'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _usernameController,
-              decoration: InputDecoration(
-                labelText: 'Username',
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+            child: Container(
+              padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+              width: 450,
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: "Masukkan username",
+                  labelText: "Username",
+                  prefixIcon: Icon(Icons.person_2_rounded),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: _passwordController,
-              obscureText: true,
+          ),
+          Container(
+            width: 450,
+            padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+            child: TextField(
+              obscureText: Secure,
               decoration: InputDecoration(
-                labelText: 'Password',
+                hintText: "Masukkan Password",
+                labelText: "Password",
+                prefixIcon: Icon(Icons.key),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    Secure ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      Secure = !Secure;
+                    });
+                  },
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Kirim data ke backend untuk verifikasi
-                String username = _usernameController.text;
-                String password = _passwordController.text;
-                // Panggil fungsi untuk melakukan verifikasi
-                _verifyLogin(username, password);
-              },
-              child: const Text('Login'),
-            ),
-          ],
-        ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              String email = _emailController.text;
+              String password = _passwordController.text;
+              _verifyLogin(email, password);
+            },
+            child: Text('Login'),
+          )
+        ],
       ),
     );
   }
 
-  void _verifyLogin(String username, String password) {
-    // Simulasi login berhasil
-    bool loginSuccess = true; // Ganti dengan logika verifikasi yang sesungguhnya
+  void _verifyLogin(String email, String password) {
+    String hashedPassword = _hashPassword(password);
+    _verifyLoginBackend(email, hashedPassword);
+  }
+
+  String _hashPassword(String password) {
+    var bytes = utf8.encode(password);
+    var digest = sha256.convert(bytes);
+    return digest.toString();
+  }
+
+  void _verifyLoginBackend(String email, String hashedPassword) {
+    bool loginSuccess = true;
 
     if (loginSuccess) {
       Navigator.pushReplacement(
@@ -78,38 +114,9 @@ class _LoginPageState extends State<LoginPage> {
         MaterialPageRoute(builder: (context) => HomePage()),
       );
     } else {
-      // Tampilkan pesan kesalahan jika login gagal
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Login failed')),
       );
     }
-  }
-}
-
-class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Welcome to Home Page!'),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context); // Kembali ke halaman login
-              },
-              child: const Text('Logout'),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

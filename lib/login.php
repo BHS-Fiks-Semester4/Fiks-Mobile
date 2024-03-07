@@ -1,13 +1,13 @@
 <?php
 require_once('database.php');
 
-$username = $_POST["username"];
+$email = $_POST["email"];
 $password = $_POST["password"];
 
 // Cek apakah sesuai dengan database
-$query = "SELECT `username-user`, `password-user`
+$query = "SELECT `email`, `password`
           FROM `user`
-          WHERE `username-user` = '$username' AND `password-user` = '$password'";
+          WHERE `email` = '$email' AND `password` = '$password'";
 
 $obj_query = mysqli_query($db, $query);
 
@@ -17,8 +17,8 @@ if ($obj_query && mysqli_num_rows($obj_query) > 0) {
         array(
             'response' => true,
             'payload' => array(
-                "username" => $data["username-user"],
-                "password" => $data["password-user"]
+                "email" => $data["email"],
+                "password" => $data["password"]
             )
         )
     );
