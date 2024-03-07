@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:crypto/crypto.dart';
+import 'package:http/http.dart' as http;
+import 'package:mobile/LupaPassword.dart';
 import 'HomePage.dart';
 
 void main() {
@@ -27,7 +28,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool Secure = true;
+  bool _secure = true;
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 
@@ -39,47 +40,48 @@ class _LoginPageState extends State<LoginPage> {
       ),
       body: Center(
         child: SizedBox(
-          width: 400, height: 400,
+          width: 400,
+          height: 400,
           child: Card(
             child: Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
                     width: 300,
-                    padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                     child: TextField(
                       controller: _emailController,
-                      decoration: InputDecoration(
-                        hintText: "Masukkan username",
-                        labelText: "Username",
+                      decoration: const InputDecoration(
+                        hintText: "Enter your email",
+                        labelText: "Email",
                         prefixIcon: Icon(Icons.person),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Container(
                     width: 300,
-                    padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                     child: TextField(
                       controller: _passwordController,
-                      obscureText: Secure,
+                      obscureText: _secure,
                       decoration: InputDecoration(
-                        hintText: "Masukkan Password",
+                        hintText: "Enter your password",
                         labelText: "Password",
-                        prefixIcon: Icon(Icons.lock),
+                        prefixIcon: const Icon(Icons.lock),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            Secure ? Icons.visibility_off : Icons.visibility,
+                            _secure ? Icons.visibility_off : Icons.visibility,
                           ),
                           onPressed: () {
                             setState(() {
-                              Secure = !Secure;
+                              _secure = !_secure;
                             });
                           },
                         ),
@@ -89,14 +91,24 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
                       String email = _emailController.text;
                       String password = _passwordController.text;
                       _verifyLogin(email, password);
                     },
-                    child: Text('Login'),
+                    child: const Text('Login'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => lupaPassword()),
+                      );
+                    },
+                    child: Text('Lupa Kata Sandi?'),
                   ),
                 ],
               ),
@@ -107,28 +119,32 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _verifyLogin(String email, String password) {
-    String hashedPassword = _hashPassword(password);
-    _verifyLoginBackend(email, hashedPassword);
-  }
+  Future<void> _verifyLogin(String email, String password) async {
+    // Kirim permintaan HTTP ke server untuk verifikasi login
+    var response = await http.post(
+      Uri.parse('http://localhost/Fiks-Mobile/lib/login.php'),
+      body: {'email': email, 'password': password},
+    );
 
-  String _hashPassword(String password) {
-    var bytes = utf8.encode(password);
-    var digest = sha256.convert(bytes);
-    return digest.toString();
-  }
-
-  void _verifyLoginBackend(String email, String hashedPassword) {
-    bool loginSuccess = true;
-
-    if (loginSuccess) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-      );
+    // Periksa status kode respons
+    if (response.statusCode == 200) {
+      var responseData = jsonDecode(response.body);
+      if (responseData['status'] == 'success') {
+        // Navigasi ke halaman beranda jika login berhasil
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      } else {
+        // Tampilkan pesan kesalahan jika login gagal
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(responseData['message'])),
+        );
+      }
     } else {
+      // Tampilkan pesan kesalahan jika gagal terhubung ke server
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login failed')),
+        SnackBar(content: Text('Failed to connect to the server')),
       );
     }
   }
