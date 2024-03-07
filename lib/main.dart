@@ -37,59 +37,72 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         title: const Text('Login'),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(
-            child: Container(
-              padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-              width: 450,
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: "Masukkan username",
-                  labelText: "Username",
-                  prefixIcon: Icon(Icons.person_2_rounded),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+      body: Center(
+        child: SizedBox(
+          width: 400, height: 400,
+          child: Card(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 300,
+                    padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+                    child: TextField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        hintText: "Masukkan username",
+                        labelText: "Username",
+                        prefixIcon: Icon(Icons.person),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  SizedBox(height: 16),
+                  Container(
+                    width: 300,
+                    padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+                    child: TextField(
+                      controller: _passwordController,
+                      obscureText: Secure,
+                      decoration: InputDecoration(
+                        hintText: "Masukkan Password",
+                        labelText: "Password",
+                        prefixIcon: Icon(Icons.lock),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            Secure ? Icons.visibility_off : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              Secure = !Secure;
+                            });
+                          },
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      String email = _emailController.text;
+                      String password = _passwordController.text;
+                      _verifyLogin(email, password);
+                    },
+                    child: Text('Login'),
+                  ),
+                ],
               ),
             ),
           ),
-          Container(
-            width: 450,
-            padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-            child: TextField(
-              obscureText: Secure,
-              decoration: InputDecoration(
-                hintText: "Masukkan Password",
-                labelText: "Password",
-                prefixIcon: Icon(Icons.key),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    Secure ? Icons.visibility_off : Icons.visibility,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      Secure = !Secure;
-                    });
-                  },
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              String email = _emailController.text;
-              String password = _passwordController.text;
-              _verifyLogin(email, password);
-            },
-            child: Text('Login'),
-          )
-        ],
+        ),
       ),
     );
   }
