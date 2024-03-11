@@ -32,7 +32,7 @@ if ($result && mysqli_num_rows($result) > 0) {
         echo json_encode(array('status' => 'success', 'message' => 'Login berhasil'));
     } else {
         // Password tidak cocok
-        echo json_encode(array('status' => 'error', 'message' => 'Email atau password salah'));
+        echo json_encode(array('status' => 'error', 'message' => 'password salah'));
     }
 } else {
     // Email tidak ditemukan di database

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/LupaPassword.dart';
+import 'package:mobile/register.dart';
 import 'HomePage.dart';
 
 void main() {
@@ -98,17 +99,34 @@ class _LoginPageState extends State<LoginPage> {
                       String password = _passwordController.text;
                       _verifyLogin(email, password);
                     },
+                    style: ButtonStyle(
+                      minimumSize: MaterialStateProperty.all(Size(300, 40)),
+                    ),
                     child: const Text('Login'),
                   ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => lupaPassword()),
-                      );
-                    },
-                    child: Text('Lupa Kata Sandi?'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => lupaPassword()),
+                          );
+                        },
+                        child: Text('Lupa Kata Sandi?'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Register()),
+                          );
+                        },
+                        child: Text('regsiter'),
+                      ),
+                    ],
                   ),
                 ],
               ),
