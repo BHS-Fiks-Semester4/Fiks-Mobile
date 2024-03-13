@@ -5,9 +5,11 @@ class Register extends StatefulWidget {
 
   @override
   State<Register> createState() => _RegisterState();
+  
 }
 
 class _RegisterState extends State<Register> {
+  bool _secured = true;
   bool _secure = true;
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
@@ -88,11 +90,21 @@ class _RegisterState extends State<Register> {
                     padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                     child: TextField(
                       controller: _passwordController,
-                      obscureText: true,
-                      decoration: const InputDecoration(
+                      obscureText: _secure,
+                      decoration: InputDecoration(
                         hintText: "Masukkan Password",
                         labelText: "Password",
-                        prefixIcon: Icon(Icons.lock),
+                        prefixIcon: const Icon(Icons.lock),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _secure ? Icons.visibility_off : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _secure = !_secure;
+                            });
+                          },
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                         ),
@@ -103,12 +115,22 @@ class _RegisterState extends State<Register> {
                     width: 300,
                     padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                     child: TextField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                        hintText: "Masukkan Password",
+                      controller: _confirmpw,
+                      obscureText: _secured,
+                      decoration: InputDecoration(
+                        hintText: "Konfirmasi Password",
                         labelText: "Password",
                         prefixIcon: Icon(Icons.lock),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _secured ? Icons.visibility_off : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _secured = !_secured;
+                            });
+                          },
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                         ),
