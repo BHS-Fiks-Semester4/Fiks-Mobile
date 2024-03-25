@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
@@ -18,11 +20,12 @@ class _RegisterState extends State<Register> {
   DateTime selectedDate = DateTime.now();
   TextEditingController _alamat = TextEditingController();
   TextEditingController _confirmpw = TextEditingController();
-  TextEditingController _agama = TextEditingController();
   TextEditingController _nohp = TextEditingController();
+  TextEditingController _selectedRegionController =
+      TextEditingController(text: 'Pilih Agama');
   String selectedRegion = 'Pilih Agama';
   List<String> _items = ['Pilih Agama', 'Islam', 'Hindu', 'Budha'];
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Key for Form
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey _key = GlobalKey();
 
   @override
@@ -69,6 +72,28 @@ class _RegisterState extends State<Register> {
                         width: 300,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                         child: TextFormField(
+                          controller: _alamat,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Alamat tidak boleh kosong';
+                            }
+                            return null;
+                          },
+                          decoration: const InputDecoration(
+                            hintText: "Masukkan Alamat",
+                            labelText: "Alamat",
+                            prefixIcon: Icon(Icons.person),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 300,
+                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                        child: TextFormField(
                           controller: _username,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -93,6 +118,15 @@ class _RegisterState extends State<Register> {
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                         child: TextFormField(
                           controller: _emailController,
+                          decoration: const InputDecoration(
+                            hintText: "Masukkan Email",
+                            labelText: "Email",
+                            prefixIcon: Icon(Icons.person),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                            ),
+                          ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Email tidak boleh kosong';
@@ -105,15 +139,6 @@ class _RegisterState extends State<Register> {
                             }
                             return null;
                           },
-                          decoration: const InputDecoration(
-                            hintText: "Masukkan Email",
-                            labelText: "Email",
-                            prefixIcon: Icon(Icons.person),
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                            ),
-                          ),
                         ),
                       ),
                       SizedBox(height: 10),
@@ -221,8 +246,7 @@ class _RegisterState extends State<Register> {
                         child: TextFormField(
                           key: _key,
                           readOnly: true,
-                          controller:
-                              TextEditingController(text: selectedRegion),
+                          controller: _selectedRegionController,
                           validator: (value) {
                             if (value == null ||
                                 value.isEmpty ||
@@ -252,7 +276,25 @@ class _RegisterState extends State<Register> {
                       ElevatedButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            register();
+                            String namaLengkap = _namalengkap.text;
+                            String username = _username.text;
+                            String alamat = _alamat.text;
+                            String email = _emailController.text;
+                            String password = _passwordController.text;
+                            String confirmPassword = _confirmpw.text;
+                            String tanggalLahir = _date.text;
+                            String agama = _selectedRegionController.text;
+                            String noHP = _nohp.text;
+                            _verifyLogin(
+                                namaLengkap,
+                                username,
+                                alamat,
+                                email,
+                                password,
+                                confirmPassword,
+                                tanggalLahir,
+                                agama,
+                                noHP);
                           }
                         },
                         style: ButtonStyle(
@@ -289,20 +331,9 @@ class _RegisterState extends State<Register> {
   }
 
   void _showPopupMenu(BuildContext context) async {
-    final RenderBox textFieldRenderBox =
-        _key.currentContext!.findRenderObject() as RenderBox;
-    final Offset textFieldOffset =
-        textFieldRenderBox.localToGlobal(Offset.zero);
-    final double textFieldWidth = textFieldRenderBox.size.width;
-    final double textFieldHeight = textFieldRenderBox.size.height;
     final result = await showMenu(
       context: context,
-      position: RelativeRect.fromLTRB(
-        textFieldOffset.dx,
-        textFieldOffset.dy + textFieldHeight,
-        textFieldOffset.dx + textFieldWidth,
-        textFieldOffset.dy + textFieldHeight * 2,
-      ),
+      position: RelativeRect.fromLTRB(0, 1000, 0, 0),
       items: _items.map((String item) {
         return PopupMenuItem<String>(
           value: item,
@@ -312,58 +343,51 @@ class _RegisterState extends State<Register> {
     );
     if (result != null) {
       setState(() {
-        selectedRegion = result;
+        _selectedRegionController.text = result;
       });
     }
   }
 
-  // Method to handle registration
-  void register() {
-    // Get the value of each field
-    String namaLengkap = _namalengkap.text;
-    String username = _username.text;
-    String email = _emailController.text;
-    String password = _passwordController.text;
-    String confirmPassword = _confirmpw.text;
-    String tanggalLahir = _date.text;
-    String agama = selectedRegion;
-    // Validate if password doesn't match the confirmation
-    if (password != confirmPassword) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Error'),
-            content: Text('Password dan konfirmasi password tidak cocok.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Success'),
-          content: Text('Registrasi berhasil.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
+  Future<void> _verifyLogin(
+      String namaLengkap,
+      String username,
+      String alamat,
+      String email,
+      String password,
+      String confirmPassword,
+      String tanggalLahir,
+      String agama,
+      String noHP) async {
+    var response = await http.post(
+      Uri.parse('http://localhost/Fiks-Mobile/lib/register.php'),
+      body: {
+        'namaLengkap': namaLengkap,
+        'username': username,
+        'tanggalLahir': tanggalLahir,
+        'selectedRegion': agama,
+        'alamat': alamat,
+                'noHP': noHP,
+        'email': email,
+        'password': password,
+        'confirmPassword':password,
       },
     );
+
+    if (response.statusCode == 200) {
+      var responseData = jsonDecode(response.body);
+      if (responseData['success']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(responseData['message'])),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(responseData['message'])),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to connect to the server')),
+      );
+    }
   }
 }

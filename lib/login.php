@@ -16,8 +16,8 @@ require_once('database.php');
 $email = mysqli_real_escape_string($db, $_POST["email"]);
 $password = $_POST["password"];
 
-// Query database untuk mendapatkan hash password berdasarkan email
-$query = "SELECT `password`
+// Query database untuk mendapatkan hash password dan username berdasarkan email
+$query = "SELECT `password`, `username`
           FROM `user`
           WHERE `email` = '$email'";
 $result = mysqli_query($db, $query);
@@ -25,14 +25,15 @@ $result = mysqli_query($db, $query);
 if ($result && mysqli_num_rows($result) > 0) {
     $row = mysqli_fetch_assoc($result);
     $hashed_password_from_db = $row['password'];
+    $username = $row['username'];
 
     // Verifikasi password
     if (password_verify($password, $hashed_password_from_db)) {
-        // Password cocok, lakukan tindakan setelah login sukses
-        echo json_encode(array('status' => 'success', 'message' => 'Login berhasil'));
+        // Password cocok, kirim respons JSON dengan status sukses dan informasi username
+        echo json_encode(array('status' => 'success', 'username' => $username, 'message' => 'Login berhasil'));
     } else {
         // Password tidak cocok
-        echo json_encode(array('status' => 'error', 'message' => 'password salah'));
+        echo json_encode(array('status' => 'error', 'message' => 'Password salah'));
     }
 } else {
     // Email tidak ditemukan di database

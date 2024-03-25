@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/LupaPassword.dart';
+import 'package:mobile/model.dart';
 import 'package:mobile/register.dart';
 import 'HomePage.dart';
 
@@ -32,6 +33,8 @@ class _LoginPageState extends State<LoginPage> {
   bool _secure = true;
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Key for Form
+  bool _isEmailValid = true;
 
   @override
   Widget build(BuildContext context) {
@@ -46,90 +49,110 @@ class _LoginPageState extends State<LoginPage> {
           child: Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 300,
-                    height: 50,
-                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    child: TextField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(
-                        hintText: "Enter your email",
-                        labelText: "Email",
-                        prefixIcon: Icon(Icons.person),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Container(
-                    width: 300,
-                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    child: TextField(
-                      controller: _passwordController,
-                      obscureText: _secure,
-                      decoration: InputDecoration(
-                        hintText: "Enter your password",
-                        labelText: "Password",
-                        prefixIcon: const Icon(Icons.lock),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _secure ? Icons.visibility_off : Icons.visibility,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 300,
+                      padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                      child: TextFormField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                          hintText: "Masukkan Email",
+                          labelText: "Email",
+                          prefixIcon: Icon(Icons.person),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
                           ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Email tidak boleh kosong';
+                          }
+                          bool isValidEmail =
+                              RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                  .hasMatch(value);
+                          return null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      width: 300,
+                      padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                      child: TextFormField(
+                        controller: _passwordController,
+                        obscureText: _secure,
+                        decoration: InputDecoration(
+                          hintText: "Enter your password",
+                          labelText: "Password",
+                          prefixIcon: const Icon(Icons.lock),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _secure ? Icons.visibility_off : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _secure = !_secure;
+                              });
+                            },
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Password tidak boleh kosong';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          String email = _emailController.text;
+                          String password = _passwordController.text;
+                          _verifyLogin(email, password);
+                        }
+                      },
+                      style: ButtonStyle(
+                        minimumSize: MaterialStateProperty.all(Size(300, 40)),
+                      ),
+                      child: const Text('Login'),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        TextButton(
                           onPressed: () {
-                            setState(() {
-                              _secure = !_secure;
-                            });
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => lupaPassword()),
+                            );
                           },
+                          child: Text('Lupa Kata Sandi?'),
                         ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Register()),
+                            );
+                          },
+                          child: Text('Regsiter'),
                         ),
-                      ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      String email = _emailController.text;
-                      String password = _passwordController.text;
-                      _verifyLogin(email, password);
-                    },
-                    style: ButtonStyle(
-                      minimumSize: MaterialStateProperty.all(Size(300, 40)),
-                    ),
-                    child: const Text('Login'),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => lupaPassword()),
-                          );
-                        },
-                        child: Text('Lupa Kata Sandi?'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => Register()),
-                          );
-                        },
-                        child: Text('regsiter'),
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -149,21 +172,26 @@ class _LoginPageState extends State<LoginPage> {
     if (response.statusCode == 200) {
       var responseData = jsonDecode(response.body);
       if (responseData['status'] == 'success') {
-        // Navigasi ke halaman beranda jika login berhasil
-        Navigator.pushReplacement(
+        // Login berhasil
+        String username =
+            responseData['username']; // Ambil username dari respons
+        // Teruskan username ke halaman beranda
+        Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => HomePage()),
+          MaterialPageRoute(
+              builder: (context) =>
+                  HomePage(user: User( username: username))),
         );
       } else {
-        // Tampilkan pesan kesalahan jika login gagal
+        // Login gagal
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(responseData['message'])),
         );
       }
     } else {
-      // Tampilkan pesan kesalahan jika gagal terhubung ke server
+      // Gagal terhubung ke server
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to connect to the server')),
+        SnackBar(content: Text('Gagal terhubung ke server')),
       );
     }
   }
