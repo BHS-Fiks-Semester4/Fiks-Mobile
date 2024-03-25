@@ -5,7 +5,6 @@ class Register extends StatefulWidget {
 
   @override
   State<Register> createState() => _RegisterState();
-  
 }
 
 class _RegisterState extends State<Register> {
@@ -23,6 +22,7 @@ class _RegisterState extends State<Register> {
   TextEditingController _nohp = TextEditingController();
   String selectedRegion = 'Pilih Agama';
   List<String> _items = ['Pilih Agama', 'Islam', 'Hindu', 'Budha'];
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Key for Form
   final GlobalKey _key = GlobalKey();
 
   @override
@@ -31,157 +31,239 @@ class _RegisterState extends State<Register> {
       appBar: AppBar(
         title: Text('Register'),
       ),
-      body: Center(
-        child: SizedBox(
-          width: 400,
-          height: 700,
-          child: Card(
-            child: Padding(
-              padding: EdgeInsets.all(10),
-              child: Column(
-                children: [
-                  Container(
-                    width: 300,
-                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    child: TextField(
-                      controller: _namalengkap,
-                      decoration: const InputDecoration(
-                        hintText: "Masukkan Nama",
-                        labelText: "Nama",
-                        prefixIcon: Icon(Icons.person),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: 300,
-                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    child: TextField(
-                      controller: _username,
-                      decoration: const InputDecoration(
-                        hintText: "Masukkan Username",
-                        labelText: "Username",
-                        prefixIcon: Icon(Icons.person),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: 300,
-                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    child: TextField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(
-                        hintText: "Masukkan Email",
-                        labelText: "Email",
-                        prefixIcon: Icon(Icons.person),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: 300,
-                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    child: TextField(
-                      controller: _passwordController,
-                      obscureText: _secure,
-                      decoration: InputDecoration(
-                        hintText: "Masukkan Password",
-                        labelText: "Password",
-                        prefixIcon: const Icon(Icons.lock),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _secure ? Icons.visibility_off : Icons.visibility,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _secure = !_secure;
-                            });
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Card(
+              child: Padding(
+                padding: EdgeInsets.all(40),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 300,
+                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                        child: TextFormField(
+                          controller: _namalengkap,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Nama tidak boleh kosong';
+                            }
+                            return null;
                           },
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: 300,
-                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    child: TextField(
-                      controller: _confirmpw,
-                      obscureText: _secured,
-                      decoration: InputDecoration(
-                        hintText: "Konfirmasi Password",
-                        labelText: "Password",
-                        prefixIcon: Icon(Icons.lock),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _secured ? Icons.visibility_off : Icons.visibility,
+                          decoration: const InputDecoration(
+                            hintText: "Masukkan Nama",
+                            labelText: "Nama",
+                            prefixIcon: Icon(Icons.person),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                            ),
                           ),
-                          onPressed: () {
-                            setState(() {
-                              _secured = !_secured;
-                            });
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Container(
+                        width: 300,
+                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                        child: TextFormField(
+                          controller: _username,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Username tidak boleh kosong';
+                            }
+                            return null;
                           },
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: 300,
-                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    child: TextFormField(
-                      controller: _date,
-                      readOnly: true,
-                      onTap: () {
-                        _selectDate(context);
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Tanggal Lahir',
-                        hintText: 'Pilih Tanggal Lahir',
-                        suffixIcon: Icon(Icons.calendar_today),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          decoration: const InputDecoration(
+                            hintText: "Masukkan Username",
+                            labelText: "Username",
+                            prefixIcon: Icon(Icons.person),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  Container(
-                    width: 300,
-                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    child: TextFormField(
-                      key: _key,
-                      readOnly: true,
-                      controller: TextEditingController(text: selectedRegion),
-                      onTap: () {
-                        _showPopupMenu(context);
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Select Item',
-                        border: OutlineInputBorder(),
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.arrow_drop_down),
-                          onPressed: () {
+                      SizedBox(height: 10),
+                      Container(
+                        width: 300,
+                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                        child: TextFormField(
+                          controller: _emailController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Email tidak boleh kosong';
+                            }
+                            bool isValidEmail =
+                                RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                    .hasMatch(value);
+                            if (!isValidEmail) {
+                              return 'Format email tidak valid';
+                            }
+                            return null;
+                          },
+                          decoration: const InputDecoration(
+                            hintText: "Masukkan Email",
+                            labelText: "Email",
+                            prefixIcon: Icon(Icons.person),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Container(
+                        width: 300,
+                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                        child: TextFormField(
+                          controller: _passwordController,
+                          obscureText: _secure,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Password tidak boleh kosong';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            hintText: "Masukkan Password",
+                            labelText: "Password",
+                            prefixIcon: const Icon(Icons.lock),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _secure
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _secure = !_secure;
+                                });
+                              },
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Container(
+                        width: 300,
+                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                        child: TextFormField(
+                          controller: _confirmpw,
+                          obscureText: _secured,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Konfirmasi Password tidak boleh kosong';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            hintText: "Konfirmasi Password",
+                            labelText: "Password",
+                            prefixIcon: Icon(Icons.lock),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _secured
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _secured = !_secured;
+                                });
+                              },
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Container(
+                        width: 300,
+                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                        child: TextFormField(
+                          controller: _date,
+                          readOnly: true,
+                          onTap: () {
+                            _selectDate(context);
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Tanggal Lahir tidak boleh kosong';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            labelText: 'Tanggal Lahir',
+                            hintText: 'Pilih Tanggal Lahir',
+                            suffixIcon: Icon(Icons.calendar_today),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Container(
+                        width: 300,
+                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                        child: TextFormField(
+                          key: _key,
+                          readOnly: true,
+                          controller:
+                              TextEditingController(text: selectedRegion),
+                          validator: (value) {
+                            if (value == null ||
+                                value.isEmpty ||
+                                value == 'Pilih Agama') {
+                              return 'Agama harus dipilih';
+                            }
+                            return null;
+                          },
+                          onTap: () {
                             _showPopupMenu(context);
                           },
+                          decoration: InputDecoration(
+                            labelText: 'Select Item',
+                            border: OutlineInputBorder(),
+                            suffixIcon: IconButton(
+                              icon: Icon(Icons.arrow_drop_down),
+                              onPressed: () {
+                                _showPopupMenu(context);
+                              },
+                            ),
+                            suffixIconConstraints:
+                                BoxConstraints(minWidth: 24, minHeight: 24),
+                          ),
                         ),
-                        suffixIconConstraints:
-                            BoxConstraints(minWidth: 24, minHeight: 24),
                       ),
-                    ),
+                      SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            register();
+                          }
+                        },
+                        style: ButtonStyle(
+                          minimumSize: MaterialStateProperty.all(Size(300, 40)),
+                        ),
+                        child: Text('Submit'),
+                      ),
+                      SizedBox(height: 16),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                ],
+                ),
               ),
             ),
           ),
@@ -194,10 +276,9 @@ class _RegisterState extends State<Register> {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: selectedDate,
-      firstDate: DateTime(1),
+      firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
-
     if (pickedDate != null && pickedDate != selectedDate) {
       setState(() {
         selectedDate = pickedDate;
@@ -229,7 +310,6 @@ class _RegisterState extends State<Register> {
         );
       }).toList(),
     );
-
     if (result != null) {
       setState(() {
         selectedRegion = result;
@@ -237,7 +317,9 @@ class _RegisterState extends State<Register> {
     }
   }
 
+  // Method to handle registration
   void register() {
+    // Get the value of each field
     String namaLengkap = _namalengkap.text;
     String username = _username.text;
     String email = _emailController.text;
@@ -245,8 +327,7 @@ class _RegisterState extends State<Register> {
     String confirmPassword = _confirmpw.text;
     String tanggalLahir = _date.text;
     String agama = selectedRegion;
-
-    // Validasi jika password tidak sesuai dengan konfirmasi
+    // Validate if password doesn't match the confirmation
     if (password != confirmPassword) {
       showDialog(
         context: context,
@@ -267,5 +348,22 @@ class _RegisterState extends State<Register> {
       );
       return;
     }
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Success'),
+          content: Text('Registrasi berhasil.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

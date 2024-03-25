@@ -52,6 +52,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   Container(
                     width: 300,
+                    height: 50,
                     padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                     child: TextField(
                       controller: _emailController,
