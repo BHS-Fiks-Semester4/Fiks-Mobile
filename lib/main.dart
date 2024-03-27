@@ -45,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
       body: Center(
         child: SizedBox(
           width: 400,
-          height: 400,
+          height: 600,
           child: Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -55,6 +55,13 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    Container(
+                      child: Image.asset(
+                        'assets/logo.png',
+                        width: 200,
+                        height: 200,
+                      ),
+                    ),
                     Container(
                       width: 300,
                       padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -179,8 +186,7 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) =>
-                  HomePage(user: User( username: username))),
+              builder: (context) => HomePage(user: User(username: username))),
         );
       } else {
         // Login gagal

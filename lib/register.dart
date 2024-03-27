@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile/main.dart';
 
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
@@ -46,6 +47,13 @@ class _RegisterState extends State<Register> {
                   child: Column(
                     children: [
                       Container(
+                        child: Image.asset(
+                          'assets/logo.png',
+                          width: 200,
+                          height: 200,
+                        ),
+                      ),
+                      Container(
                         width: 300,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                         child: TextFormField(
@@ -57,8 +65,8 @@ class _RegisterState extends State<Register> {
                             return null;
                           },
                           decoration: const InputDecoration(
-                            hintText: "Masukkan Nama",
-                            labelText: "Nama",
+                            hintText: "Masukkan Nama Lengkap",
+                            labelText: "Nama Lengkap ",
                             prefixIcon: Icon(Icons.person),
                             border: OutlineInputBorder(
                               borderRadius:
@@ -187,6 +195,9 @@ class _RegisterState extends State<Register> {
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Konfirmasi Password tidak boleh kosong';
+                            }
+                            if (value != _passwordController.text) {
+                              return 'Konfirmasi Password tidak sesuai dengan Password';
                             }
                             return null;
                           },
@@ -366,19 +377,26 @@ class _RegisterState extends State<Register> {
         'tanggalLahir': tanggalLahir,
         'selectedRegion': agama,
         'alamat': alamat,
-                'noHP': noHP,
+        'noHP': noHP,
         'email': email,
         'password': password,
-        'confirmPassword':password,
+        'confirmPassword': password,
       },
     );
 
     if (response.statusCode == 200) {
       var responseData = jsonDecode(response.body);
       if (responseData['success']) {
+         Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LoginPage(),
+          ),
+        );
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(responseData['message'])),
         );
+       
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(responseData['message'])),
