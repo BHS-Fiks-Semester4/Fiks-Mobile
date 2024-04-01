@@ -26,6 +26,8 @@ class _HomePageState extends State<HomePage> {
           child: _getBody(),
         ),
       bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey.shade300,
         currentIndex: _currentIndex,
         onTap: (int newIndex){
           setState((){
@@ -55,31 +57,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-
-      // appBar: AppBar(
-      //   title: Text('Home'),
-      // ),
-      // body: Center(
-      //   child: Column(
-      //     mainAxisAlignment: MainAxisAlignment.center,
-      //     children: [
-      //       Text(
-      //         'Welcome, ${widget.user.username}!\n Namamu ${widget.user.name}\n Emailmu ${widget.user.email}\n Agamamu ${widget.user.agama}\n Alamatmu ${widget.user.alamat}\n Nomor handphonemu ${widget.user.no_hp}\n Tanggal lahirmu ${widget.user.tanggal_lahir}',
-      //         style: TextStyle(
-      //           fontSize: 24,
-      //           fontWeight: FontWeight.bold,
-      //         ),
-      //       ),
-      //       SizedBox(height: 20),
-      //       ElevatedButton(
-      //         onPressed: () {
-      //           // Implement your button functionality here
-      //         },
-      //         child: Text('Logout'),
-      //       ),
-      //     ],
-      //   ),
-      // ),
     );
   }
     Widget _getBody() {
