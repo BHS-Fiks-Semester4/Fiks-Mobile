@@ -5,6 +5,7 @@ import 'package:mobile/LupaPassword.dart';
 import 'package:mobile/model.dart';
 import 'package:mobile/register.dart';
 import 'HomePage.dart';
+import 'package:mobile/view/Home.dart';
 
 void main() {
   runApp(const MainApp());
@@ -15,15 +16,17 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: LoginPage(),
+    return MaterialApp(
+      home: const LoginPage(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  final String? email;
+
+  const LoginPage({Key? key, this.email}) : super(key: key);
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -35,6 +38,12 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Key for Form
   bool _isEmailValid = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.text = widget.email ?? '';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,13 +71,14 @@ class _LoginPageState extends State<LoginPage> {
                         height: 200,
                       ),
                     ),
+                    const SizedBox(height: 16),
                     Container(
                       width: 300,
                       padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                       child: TextFormField(
                         controller: _emailController,
                         decoration: InputDecoration(
-                          hintText: "Masukkan Email",
+                          hintText: "Enter your Email",
                           labelText: "Email",
                           prefixIcon: Icon(Icons.person),
                           border: OutlineInputBorder(
@@ -77,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Email tidak boleh kosong';
+                            return 'Email cannot be empty';
                           }
                           bool isValidEmail =
                               RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
@@ -86,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
                         },
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 5),
                     Container(
                       width: 300,
                       padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -113,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Password tidak boleh kosong';
+                            return 'Password cannot be empty!';
                           }
                           return null;
                         },
@@ -129,9 +139,19 @@ class _LoginPageState extends State<LoginPage> {
                         }
                       },
                       style: ButtonStyle(
-                        minimumSize: MaterialStateProperty.all(Size(300, 40)),
+                        minimumSize: MaterialStateProperty.all(Size(290, 50)),
+                        backgroundColor: MaterialStateProperty.all<Color>(Colors.pink),
+                        foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)
+                        ))
                       ),
-                      child: const Text('Login'),
+                      child: const Text(
+                        'Login',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -144,7 +164,12 @@ class _LoginPageState extends State<LoginPage> {
                                   builder: (context) => lupaPassword()),
                             );
                           },
-                          child: Text('Lupa Kata Sandi?'),
+                          child: Text(
+                            'Forgotten password?',
+                            style: TextStyle(
+                              color: Colors.blue
+                            ),
+                          ),
                         ),
                         TextButton(
                           onPressed: () {
@@ -154,7 +179,12 @@ class _LoginPageState extends State<LoginPage> {
                                   builder: (context) => Register()),
                             );
                           },
-                          child: Text('Regsiter'),
+                          child: Text(
+                            'Register',
+                            style: TextStyle(
+                              color: Colors.blue
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -180,13 +210,21 @@ class _LoginPageState extends State<LoginPage> {
       var responseData = jsonDecode(response.body);
       if (responseData['status'] == 'success') {
         // Login berhasil
-        String username =
-            responseData['username']; // Ambil username dari respons
+        // Ambil username dari respons
+        User user = User(
+          username: responseData['username'], 
+          name: responseData['name'],
+          email: responseData['email'], 
+          alamat: responseData['alamat'], 
+          agama: responseData['agama'],
+          tanggal_lahir: responseData['tanggal_lahir'], 
+        );
+
         // Teruskan username ke halaman beranda
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => HomePage(user: User(username: username))),
+              builder: (context) => HomePage(user: user)),
         );
       } else {
         // Login gagal

@@ -4,7 +4,9 @@ import 'package:http/http.dart' as http;
 import 'package:mobile/main.dart';
 
 class Register extends StatefulWidget {
-  const Register({Key? key}) : super(key: key);
+  final String? emailFromRegister;
+
+  const Register({Key? key, this.emailFromRegister}) : super(key: key);
 
   @override
   State<Register> createState() => _RegisterState();
@@ -47,12 +49,16 @@ class _RegisterState extends State<Register> {
                   child: Column(
                     children: [
                       Container(
-                        child: Image.asset(
-                          'assets/logo.png',
-                          width: 200,
-                          height: 200,
+                        child: Text(
+                          'Register',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.pink
+                          ),
                         ),
                       ),
+                      SizedBox(height: 16,),
                       Container(
                         width: 300,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -67,7 +73,6 @@ class _RegisterState extends State<Register> {
                           decoration: const InputDecoration(
                             hintText: "Masukkan Nama Lengkap",
                             labelText: "Nama Lengkap ",
-                            prefixIcon: Icon(Icons.person),
                             border: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10)),
@@ -75,7 +80,7 @@ class _RegisterState extends State<Register> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 10),
+                      
                       Container(
                         width: 300,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -90,7 +95,6 @@ class _RegisterState extends State<Register> {
                           decoration: const InputDecoration(
                             hintText: "Masukkan Alamat",
                             labelText: "Alamat",
-                            prefixIcon: Icon(Icons.person),
                             border: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10)),
@@ -112,7 +116,6 @@ class _RegisterState extends State<Register> {
                           decoration: const InputDecoration(
                             hintText: "Masukkan Username",
                             labelText: "Username",
-                            prefixIcon: Icon(Icons.person),
                             border: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10)),
@@ -120,7 +123,7 @@ class _RegisterState extends State<Register> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 10),
+                      
                       Container(
                         width: 300,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -129,7 +132,6 @@ class _RegisterState extends State<Register> {
                           decoration: const InputDecoration(
                             hintText: "Masukkan Email",
                             labelText: "Email",
-                            prefixIcon: Icon(Icons.person),
                             border: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10)),
@@ -149,7 +151,6 @@ class _RegisterState extends State<Register> {
                           },
                         ),
                       ),
-                      SizedBox(height: 10),
                       Container(
                         width: 300,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -165,7 +166,6 @@ class _RegisterState extends State<Register> {
                           decoration: InputDecoration(
                             hintText: "Masukkan Password",
                             labelText: "Password",
-                            prefixIcon: const Icon(Icons.lock),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _secure
@@ -185,7 +185,6 @@ class _RegisterState extends State<Register> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 10),
                       Container(
                         width: 300,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -203,8 +202,7 @@ class _RegisterState extends State<Register> {
                           },
                           decoration: InputDecoration(
                             hintText: "Konfirmasi Password",
-                            labelText: "Password",
-                            prefixIcon: Icon(Icons.lock),
+                            labelText: "Konfirmasi Password",
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _secured
@@ -224,7 +222,6 @@ class _RegisterState extends State<Register> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 10),
                       Container(
                         width: 300,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -250,7 +247,6 @@ class _RegisterState extends State<Register> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 10),
                       Container(
                         width: 300,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -270,8 +266,9 @@ class _RegisterState extends State<Register> {
                             _showPopupMenu(context);
                           },
                           decoration: InputDecoration(
-                            labelText: 'Select Item',
-                            border: OutlineInputBorder(),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                             suffixIcon: IconButton(
                               icon: Icon(Icons.arrow_drop_down),
                               onPressed: () {
@@ -309,11 +306,44 @@ class _RegisterState extends State<Register> {
                           }
                         },
                         style: ButtonStyle(
-                          minimumSize: MaterialStateProperty.all(Size(300, 40)),
+                          minimumSize: MaterialStateProperty.all(Size(290, 50)),
+                          backgroundColor: MaterialStateProperty.all<Color>(Colors.pink),
+                          foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)
+                          ))
                         ),
-                        child: Text('Submit'),
+                        child: Text(
+                          'Submit',
+                          style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Already have an account? ",
+                            style: TextStyle(color: Colors.grey.shade600),
+                          ),
+                          InkWell(
+                            onTap: (){
+                              Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => MainApp(),),
+                            );
+                            },
+                            child: Text(
+                              'Login',
+                              style: TextStyle(
+                                color: Colors.blue,
+                              ),
+                            ),
+                          )
+                        ],
+                      )
                     ],
                   ),
                 ),
@@ -390,7 +420,7 @@ class _RegisterState extends State<Register> {
          Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => LoginPage(),
+            builder: (context) => LoginPage(email: email),
           ),
         );
         ScaffoldMessenger.of(context).showSnackBar(
