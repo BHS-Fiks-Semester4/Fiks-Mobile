@@ -1,0 +1,24 @@
+import 'package:flutter/material.dart';
+
+class Report extends StatefulWidget {
+  const Report({super.key});
+
+  @override
+  State<Report> createState() => _ReportState();
+}
+
+class _ReportState extends State<Report> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey.shade300,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+          Text('Report', style: TextStyle(color: Colors.black),)
+        ]),
+      ),
+    );
+  }
+}
