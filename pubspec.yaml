@@ -22,5 +22,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/poto.png
     - assets/logo.png
+    
+    
+
 
