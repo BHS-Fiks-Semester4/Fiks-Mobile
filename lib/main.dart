@@ -135,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
                         if (_formKey.currentState!.validate()) {
                           String email = _emailController.text;
                           String password = _passwordController.text;
-                          _verifyLogin(email, password);
+                          _verifyLogin(email, password,context);
                         }
                       },
                       style: ButtonStyle(
@@ -198,10 +198,11 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Future<void> _verifyLogin(String email, String password) async {
+  Future<void> _verifyLogin(String email, String password, BuildContext context) async {
+  try {
     // Kirim permintaan HTTP ke server untuk verifikasi login
     var response = await http.post(
-      Uri.parse('http://localhost/Fiks-Mobile/lib/login.php'),
+      Uri.parse('http://127.0.0.1:8000/api/login-mobile'),
       body: {'email': email, 'password': password},
     );
 
@@ -210,7 +211,7 @@ class _LoginPageState extends State<LoginPage> {
       var responseData = jsonDecode(response.body);
       if (responseData['status'] == 'success') {
         // Login berhasil
-        // Ambil username dari respons
+        // Ambil data pengguna dari respons
         User user = User(
           username: responseData['username'], 
           name: responseData['name'],
@@ -220,7 +221,7 @@ class _LoginPageState extends State<LoginPage> {
           tanggal_lahir: responseData['tanggal_lahir'], 
         );
 
-        // Teruskan username ke halaman beranda
+        // Teruskan data pengguna ke halaman beranda
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -233,10 +234,17 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } else {
-      // Gagal terhubung ke server
+      // Tangani kesalahan HTTP
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal terhubung ke server')),
+        SnackBar(content: Text('Gagal terhubung ke server, kode status: ${response.statusCode}')),
       );
     }
+  } catch (e) {
+    // Tangani kesalahan lainnya
+    print('Kesalahan: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Terjadi kesalahan saat melakukan login')),
+    );
   }
+}
 }
