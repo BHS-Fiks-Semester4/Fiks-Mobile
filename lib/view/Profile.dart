@@ -13,23 +13,61 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade300,
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'Username: ${widget.user.username}',
-                style: TextStyle(fontSize: 16, color: Colors.black),
+              Container(
+                width: 430,
+                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                child: TextField(
+                  controller:
+                      TextEditingController(text: '${widget.user.username}'),
+                  style: TextStyle(fontSize: 16, color: Colors.black),
+                  enabled: false,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Username',
+                    prefix: Icon(Icons.person),
+                    labelStyle: TextStyle(color: Colors.black),
+                  ),
+                ),
               ),
-              Text(
-                'Nama Lengkap: ${widget.user.name}',
-                style: TextStyle(fontSize: 16, color: Colors.black),
+              SizedBox(height: 15),
+              Container(
+                width: 430,
+                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                child: TextField(
+                  controller:
+                      TextEditingController(text: '${widget.user.name}'),
+                  style: TextStyle(fontSize: 16, color: Colors.black),
+                  enabled: false,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Nama Lengkap',
+                    prefixIcon: Icon(Icons.people),
+                    labelStyle: TextStyle(color: Colors.black),
+                  ),
+                ),
               ),
-              Text(
-                'Alamat: ${widget.user.alamat}',
-                style: TextStyle(fontSize: 16, color: Colors.black),
+              SizedBox(height: 15),
+              Container(
+                width: 430,
+                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                child: TextField(
+                  controller:
+                      TextEditingController(text: '${widget.user.alamat}'),
+                  style: TextStyle(fontSize: 16, color: Colors.black),
+                  enabled: false,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Alamat',
+                    prefix: Icon(Icons.location_city),
+                    labelStyle: TextStyle(color: Colors.black),
+                  ),
+                ),
               ),
             ],
           ),
