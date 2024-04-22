@@ -280,6 +280,27 @@ class _RegisterState extends State<Register> {
                           ),
                         ),
                       ),
+                       Container(
+                        width: 300,
+                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                        child: TextFormField(
+                          controller: _nohp,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Username tidak boleh kosong';
+                            }
+                            return null;
+                          },
+                          decoration: const InputDecoration(
+                            hintText: "Masukkan No HP",
+                            labelText: "Nomer HP",
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                            ),
+                          ),
+                        ),
+                      ),
                       SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () {
@@ -389,34 +410,36 @@ class _RegisterState extends State<Register> {
     }
   }
 
-  Future<void> _verifyLogin(
-      String namaLengkap,
-      String username,
-      String alamat,
-      String email,
-      String password,
-      String confirmPassword,
-      String tanggalLahir,
-      String agama,
-      String noHP) async {
+ Future<void> _verifyLogin(
+  String namaLengkap,
+  String username,
+  String alamat,
+  String email,
+  String password,
+  String confirmPassword,
+  String tanggalLahir,
+  String agama,
+  String noHP) async {
+  
+  try {
     var response = await http.post(
-      Uri.parse('http://localhost/Fiks-Mobile/lib/register.php'),
+      Uri.parse('http://127.0.0.1:8000/api/register-mobile'),
       body: {
-        'namaLengkap': namaLengkap,
+        'name': namaLengkap, // Ubah namaLengkap menjadi name sesuai dengan backend
         'username': username,
-        'tanggalLahir': tanggalLahir,
-        'selectedRegion': agama,
         'alamat': alamat,
-        'noHP': noHP,
         'email': email,
         'password': password,
-        'confirmPassword': password,
+        'confirmPassword': confirmPassword, // Konfirmasi password tidak diperlukan di sini
+        'tanggal_lahir': tanggalLahir, // Ubah tanggalLahir menjadi tanggal_lahir sesuai dengan backend
+        'agama': agama,
+        'no_hp': noHP, // Ubah noHP menjadi no_hp sesuai dengan backend
       },
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) { // Perubahan status code sesuai dengan respons yang diharapkan dari backend
       var responseData = jsonDecode(response.body);
-      if (responseData['success']) {
+      if (responseData['status'] == 'success') { // Ubah pengecekan status sesuai dengan respons dari backend
          Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -437,5 +460,11 @@ class _RegisterState extends State<Register> {
         SnackBar(content: Text('Failed to connect to the server')),
       );
     }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('An error occurred: $e')),
+    );
   }
+}
+
 }
