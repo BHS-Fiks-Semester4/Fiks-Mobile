@@ -15,9 +15,68 @@ class _ManagementState extends State<Management> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-          Text('Management', style: TextStyle(color: Colors.black),)
-        ]),
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: () {},
+                  child: Text('Tombol 1'),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {},
+                  child: Text('Tombol 2'),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {},
+                  child: Text('Tombol 3'),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: () {},
+                  child: Text('Tombol 4'),
+                ),
+                SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {},
+                  child: Text('Tombol 5'),
+                ),
+                SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {},
+                  child: Text('Tombol 6'),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: () {},
+                  child: Text('Tombol 7'),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {},
+                  child: Text('Tombol 8'),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {},
+                  child: Text('Tombol 9'),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

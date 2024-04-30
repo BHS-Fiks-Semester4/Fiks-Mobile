@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'model.dart';
 import 'package:mobile/view/Profile.dart';
 import 'package:mobile/view/Transaction.dart';
 import 'package:mobile/view/Management.dart';
 import 'package:mobile/view/Report.dart';
 import 'package:mobile/view/Home.dart';
-
+import 'package:mobile/models/user.dart';
 
 class HomePage extends StatefulWidget {
   final User user;
@@ -23,20 +22,23 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-          child: _getBody(),
-        ),
+        child: _getBody(),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.grey.shade300,
         currentIndex: _currentIndex,
-        onTap: (int newIndex){
-          setState((){
+        onTap: (int newIndex) {
+          setState(() {
             _currentIndex = newIndex;
           });
         },
-        items: const[
+        items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Colors.black,),
+            icon: Icon(
+              Icons.home,
+              color: Colors.black,
+            ),
             label: 'Home',
           ),
           BottomNavigationBarItem(
@@ -59,7 +61,8 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-    Widget _getBody() {
+
+  Widget _getBody() {
     switch (_currentIndex) {
       case 0:
         return Home();
@@ -76,4 +79,3 @@ class _HomePageState extends State<HomePage> {
     }
   }
 }
-

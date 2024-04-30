@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/LupaPassword.dart';
-import 'package:mobile/model.dart';
+import 'package:mobile/models/user.dart';
 import 'package:mobile/register.dart';
 import 'HomePage.dart';
 import 'package:mobile/view/Home.dart';
@@ -197,13 +197,11 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
-  Future<void> _verifyLogin(String email, String password, BuildContext context) async {
+Future<void> _verifyLogin(String email, String password, BuildContext context) async {
   try {
     // Kirim permintaan HTTP ke server untuk verifikasi login
-    var response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/api/login-mobile'),
-      body: {'email': email, 'password': password},
+    var response = await http.get(
+      Uri.parse('http://127.0.0.1:8000/api/login-mobile?email=$email&password=$password'),
     );
 
     // Periksa status kode respons

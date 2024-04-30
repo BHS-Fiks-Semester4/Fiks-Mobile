@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/model.dart';
+import 'package:mobile/models/user.dart';
 
 class Profile extends StatefulWidget {
   final User user;
