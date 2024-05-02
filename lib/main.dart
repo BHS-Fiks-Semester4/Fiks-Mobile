@@ -6,9 +6,14 @@ import 'package:mobile/models/user.dart';
 import 'package:mobile/register.dart';
 import 'HomePage.dart';
 import 'package:mobile/view/Home.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite_common/sqlite_api.dart';
 
 void main() {
   runApp(const MainApp());
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
+  
 }
 
 class MainApp extends StatelessWidget {
@@ -43,6 +48,7 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     _emailController.text = widget.email ?? '';
+    
   }
 
   @override
@@ -210,14 +216,7 @@ Future<void> _verifyLogin(String email, String password, BuildContext context) a
       if (responseData['status'] == 'success') {
         // Login berhasil
         // Ambil data pengguna dari respons
-        User user = User(
-          username: responseData['username'], 
-          name: responseData['name'],
-          email: responseData['email'], 
-          alamat: responseData['alamat'], 
-          agama: responseData['agama'],
-          tanggal_lahir: responseData['tanggal_lahir'], 
-        );
+        User user = User.fromJson(responseData);
 
         // Teruskan data pengguna ke halaman beranda
         Navigator.push(

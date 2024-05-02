@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/models/user.dart';
+import 'package:mobile/view/editprofile.dart';
 
 class Profile extends StatefulWidget {
   final User user;
@@ -39,7 +40,6 @@ class _ProfileState extends State<Profile> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                       
                       ],
                     ),
                   ],
@@ -84,8 +84,8 @@ class _ProfileState extends State<Profile> {
                 width: 430,
                 padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                 child: TextField(
-                  controller:
-                      TextEditingController(text: '${widget.user.tanggal_lahir}'),
+                  controller: TextEditingController(
+                      text: '${widget.user.tanggal_lahir}'),
                   style: TextStyle(fontSize: 16, color: Colors.black),
                   enabled: false,
                   decoration: InputDecoration(
@@ -130,13 +130,34 @@ class _ProfileState extends State<Profile> {
                   ),
                 ),
               ),
-               SizedBox(height: 10),
-                        ElevatedButton(
-                          onPressed: () {
-                            // Aksi saat tombol "Edit" ditekan
-                          },
-                          child: Text("Edit"),
-                        ),
+              Container(
+                width: 430,
+                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                child: TextField(
+                  controller:
+                      TextEditingController(text: '${widget.user.no_hp}'),
+                  style: TextStyle(fontSize: 16, color: Colors.black),
+                  enabled: false,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'No Hp',
+                    prefix: Icon(Icons.person),
+                    labelStyle: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+               ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditProfile(currentUser: widget.user),
+                  ),
+                );
+              },
+              child: Text('Edit Profile'),
+            ),
             ],
           ),
         ),

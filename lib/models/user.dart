@@ -10,6 +10,8 @@ class User {
   final String alamat;
   final String agama;
   final String tanggal_lahir;
+  final String no_hp;
+  final int id;
 
   User({
     required this.username,
@@ -18,7 +20,8 @@ class User {
     required this.alamat,
     required this.agama,
     required this.tanggal_lahir,
-  
+    required this.no_hp,
+    required this.id,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);

@@ -11,16 +11,24 @@ dependencies:
   crypto: ^3.0.1
   flutter:
     sdk: flutter
+  sembast: ^3.7.1
+  sqflite_common_ffi_web: '>=0.1.0-dev.1'
   flutter_datetime_picker: ^1.5.1
   http: ^0.13.3
   json_annotation: ^4.9.0
   json_serializable: ^6.8.0
+  sqflite: ^2.3.3
+  sqflite_common_ffi: ^2.3.3
+
 
 dev_dependencies:
   flutter_lints: ^2.0.0
   flutter_test:
     sdk: flutter
   json_serializable: ^6.7.1
+
+
+
 
 flutter:
   uses-material-design: true
