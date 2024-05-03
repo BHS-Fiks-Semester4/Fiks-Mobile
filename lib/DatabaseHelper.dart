@@ -21,7 +21,7 @@ class DatabaseHelper {
   Future<Database> initDatabase() async {
     String path = await getDatabasesPath();
     return openDatabase(
-      join(path, 'user.db'),
+      join(path, 'akhwat_computer2.db'),
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE user(
@@ -40,41 +40,42 @@ class DatabaseHelper {
     );
   }
 
-  Future<int> addUser(User user) async {
-    Database db = await database;
-    return await db.insert('users', user.toJson());
-  }
+ Future<int> addUser(User user) async {
+  Database db = await database;
+  return await db.insert('user', user.toJson());
+}
 
-  Future<User?> getUser(int id) async {
-    Database db = await database;
-    List<Map<String, dynamic>> maps = await db.query(
-      'users',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-    if (maps.isNotEmpty) {
-      return User.fromJson(maps.first);
-    } else {
-      return null;
-    }
+Future<User?> getUserByUsername(String username) async {
+  Database db = await database;
+  List<Map<String, dynamic>> maps = await db.query(
+    'user',
+    where: 'username = ?', // Menggunakan kondisi WHERE berdasarkan username
+    whereArgs: [username],
+  );
+  if (maps.isNotEmpty) {
+    return User.fromJson(maps.first);
+  } else {
+    return null;
   }
+}
 
-  Future<int> updateUser(User user) async {
-    Database db = await database;
-    return await db.update(
-      'users',
-      user.toJson(),
-      where: 'id = ?',
-      whereArgs: [user.id],
-    );
-  }
+Future<int> updateUserByUsername(User user) async {
+  Database db = await database;
+  return await db.update(
+    'user',
+    user.toJson(),
+    where: 'username = ?', // Menggunakan kondisi WHERE berdasarkan username
+    whereArgs: [user.username],
+  );
+}
 
-  Future<int> deleteUser(int id) async {
-    Database db = await database;
-    return await db.delete(
-      'users',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-  }
+Future<int> deleteUserByUsername(String username) async {
+  Database db = await database;
+  return await db.delete(
+    'user',
+    where: 'username = ?', // Menggunakan kondisi WHERE berdasarkan username
+    whereArgs: [username],
+  );
+}
+
 }

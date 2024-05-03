@@ -8,12 +8,12 @@ import 'HomePage.dart';
 import 'package:mobile/view/Home.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite_common/sqlite_api.dart';
+import 'package:mobile/models/loginrespon.dart';
 
 void main() {
   runApp(const MainApp());
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
-  
 }
 
 class MainApp extends StatelessWidget {
@@ -48,7 +48,6 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     _emailController.text = widget.email ?? '';
-    
   }
 
   @override
@@ -141,17 +140,20 @@ class _LoginPageState extends State<LoginPage> {
                         if (_formKey.currentState!.validate()) {
                           String email = _emailController.text;
                           String password = _passwordController.text;
-                          _verifyLogin(email, password,context);
+                          _verifyLogin(email, password, context);
                         }
                       },
                       style: ButtonStyle(
-                        minimumSize: MaterialStateProperty.all(Size(290, 50)),
-                        backgroundColor: MaterialStateProperty.all<Color>(Colors.pink),
-                        foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)
-                        ))
-                      ),
+                          minimumSize: MaterialStateProperty.all(Size(290, 50)),
+                          backgroundColor:
+                              MaterialStateProperty.all<Color>(Colors.pink),
+                          foregroundColor:
+                              MaterialStateProperty.all<Color>(Colors.white),
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(10)))),
                       child: const Text(
                         'Login',
                         style: TextStyle(
@@ -172,9 +174,7 @@ class _LoginPageState extends State<LoginPage> {
                           },
                           child: Text(
                             'Forgotten password?',
-                            style: TextStyle(
-                              color: Colors.blue
-                            ),
+                            style: TextStyle(color: Colors.blue),
                           ),
                         ),
                         TextButton(
@@ -187,9 +187,7 @@ class _LoginPageState extends State<LoginPage> {
                           },
                           child: Text(
                             'Register',
-                            style: TextStyle(
-                              color: Colors.blue
-                            ),
+                            style: TextStyle(color: Colors.blue),
                           ),
                         ),
                       ],
@@ -203,45 +201,50 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-Future<void> _verifyLogin(String email, String password, BuildContext context) async {
-  try {
-    // Kirim permintaan HTTP ke server untuk verifikasi login
-    var response = await http.get(
-      Uri.parse('http://127.0.0.1:8000/api/login-mobile?email=$email&password=$password'),
-    );
 
-    // Periksa status kode respons
-    if (response.statusCode == 200) {
-      var responseData = jsonDecode(response.body);
-      if (responseData['status'] == 'success') {
-        // Login berhasil
-        // Ambil data pengguna dari respons
-        User user = User.fromJson(responseData);
+  Future<void> _verifyLogin(
+      String email, String password, BuildContext context) async {
+    try {
+      // Kirim permintaan HTTP ke server untuk verifikasi login
+      var response = await http.get(
+        Uri.parse(
+            'http://127.0.0.1:8000/api/login-mobile?email=$email&password=$password'),
+      );
 
-        // Teruskan data pengguna ke halaman beranda
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => HomePage(user: user)),
-        );
+      // Periksa status kode respons
+      if (response.statusCode == 200) {
+        var responseData = jsonDecode(response.body);
+        if (responseData['status'] == 'success') {
+          // Login berhasil
+          // Ambil data pengguna dari respons
+          // User user = User.fromJson(responseData);
+          Loginrespon loginrespon = Loginrespon.fromMap(responseData);
+
+          // Teruskan data pengguna ke halaman beranda
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage(home:loginrespon)),
+          );
+        } else {
+          // Login gagal
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(responseData['message'])),
+          );
+        }
       } else {
-        // Login gagal
+        // Tangani kesalahan HTTP
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(responseData['message'])),
+          SnackBar(
+              content: Text(
+                  'Gagal terhubung ke server, kode status: ${response.statusCode}')),
         );
       }
-    } else {
-      // Tangani kesalahan HTTP
+    } catch (e) {
+      // Tangani kesalahan lainnya
+      print('Kesalahan: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal terhubung ke server, kode status: ${response.statusCode}')),
+        SnackBar(content: Text('Terjadi kesalahan saat melakukan login')),
       );
     }
-  } catch (e) {
-    // Tangani kesalahan lainnya
-    print('Kesalahan: $e');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Terjadi kesalahan saat melakukan login')),
-    );
   }
-}
 }

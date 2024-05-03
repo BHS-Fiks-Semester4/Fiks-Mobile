@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/models/user.dart';
 import 'package:mobile/view/editprofile.dart';
+import 'package:mobile/models/loginrespon.dart';
 
 class Profile extends StatefulWidget {
-  final User user;
+  final Loginrespon user;
   const Profile({Key? key, required this.user}) : super(key: key);
 
   @override
@@ -34,7 +35,7 @@ class _ProfileState extends State<Profile> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.user.name,
+                          widget.user.name??'',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -85,7 +86,7 @@ class _ProfileState extends State<Profile> {
                 padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                 child: TextField(
                   controller: TextEditingController(
-                      text: '${widget.user.tanggal_lahir}'),
+                      text: '${widget.user.tanggalLahir}'),
                   style: TextStyle(fontSize: 16, color: Colors.black),
                   enabled: false,
                   decoration: InputDecoration(
@@ -135,7 +136,7 @@ class _ProfileState extends State<Profile> {
                 padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                 child: TextField(
                   controller:
-                      TextEditingController(text: '${widget.user.no_hp}'),
+                      TextEditingController(text: '${widget.user.noHp}'),
                   style: TextStyle(fontSize: 16, color: Colors.black),
                   enabled: false,
                   decoration: InputDecoration(

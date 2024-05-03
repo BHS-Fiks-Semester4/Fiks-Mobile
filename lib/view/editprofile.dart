@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/models/loginrespon.dart';
 import 'package:mobile/models/user.dart';
 import 'package:mobile/DatabaseHelper.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite_common/sqlite_api.dart';
+import 'package:mobile/models/loginrespon.dart';
 
 class EditProfile extends StatefulWidget {
-  final User currentUser;
+  final Loginrespon currentUser;
 
   const EditProfile({Key? key, required this.currentUser}) : super(key: key);
 
@@ -34,8 +36,8 @@ class EditProfileState extends State<EditProfile> {
     _alamatController = TextEditingController(text: widget.currentUser.alamat);
     _agamaController = TextEditingController(text: widget.currentUser.agama);
     _tanggalLahirController =
-        TextEditingController(text: widget.currentUser.tanggal_lahir);
-    _noHpController = TextEditingController(text: widget.currentUser.no_hp);
+        TextEditingController(text: widget.currentUser.tanggalLahir);
+    _noHpController = TextEditingController(text: widget.currentUser.noHp);
   }
 
   @override
@@ -110,15 +112,15 @@ class EditProfileState extends State<EditProfile> {
                   username: _usernameController.text,
                   email: _emailController.text,
                   alamat: _alamatController.text,
-                  agama: widget.currentUser.agama,
-                  tanggal_lahir: widget.currentUser.tanggal_lahir,
-                  no_hp: widget.currentUser.no_hp,
-                  name: widget.currentUser.name,
-                  id: widget.currentUser.id,
+                  agama: widget.currentUser.agama??'',
+                  tanggal_lahir: widget.currentUser.tanggalLahir??'',
+                  no_hp: widget.currentUser.noHp??'',
+                  name: widget.currentUser.name??'',
+                  id: widget.currentUser.id!,
                 );
 
                 // Panggil method updateUser dari DB Helper SQFlite dengan objek updatedUser sebagai argumen
-                await DatabaseHelper().updateUser(updatedUser);
+                await DatabaseHelper().updateUserByUsername(updatedUser);
 
                 // Tampilkan pesan berhasil
                 ScaffoldMessenger.of(context).showSnackBar(

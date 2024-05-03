@@ -5,11 +5,12 @@ import 'package:mobile/view/Management.dart';
 import 'package:mobile/view/Report.dart';
 import 'package:mobile/view/Home.dart';
 import 'package:mobile/models/user.dart';
+import 'package:mobile/models/loginrespon.dart';
 
 class HomePage extends StatefulWidget {
-  final User user;
+  final Loginrespon home;
 
-  const HomePage({Key? key, required this.user}) : super(key: key);
+  const HomePage({Key? key, required this.home}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -73,7 +74,7 @@ class _HomePageState extends State<HomePage> {
       case 3:
         return Report();
       case 4:
-        return Profile(user: widget.user);
+        return Profile(user: widget.home);
       default:
         return Home();
     }
