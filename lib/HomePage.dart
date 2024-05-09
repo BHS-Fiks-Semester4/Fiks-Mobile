@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/models/login_response/login_response.dart';
 import 'package:mobile/view/Profile.dart';
 import 'package:mobile/view/Transaction.dart';
 import 'package:mobile/view/Management.dart';
 import 'package:mobile/view/Report.dart';
 import 'package:mobile/view/Home.dart';
-import 'package:mobile/models/user.dart';
-import 'package:mobile/models/loginrespon.dart';
+import 'package:mobile/models/login_response/user.dart';
+
 
 class HomePage extends StatefulWidget {
-  final Loginrespon home;
+  final User homePage;
+  
 
-  const HomePage({Key? key, required this.home}) : super(key: key);
+  const HomePage({Key? key, required this.homePage}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -18,6 +20,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
+    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey _key = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +78,7 @@ class _HomePageState extends State<HomePage> {
       case 3:
         return Report();
       case 4:
-        return Profile(user: widget.home);
+        return Profile(user: widget.homePage);
       default:
         return Home();
     }

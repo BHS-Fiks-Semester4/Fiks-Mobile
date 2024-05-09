@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/models/loginrespon.dart';
-import 'package:mobile/models/user.dart';
-import 'package:mobile/DatabaseHelper.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite_common/sqlite_api.dart';
-import 'package:mobile/models/loginrespon.dart';
+import 'package:mobile/models/login_response/user.dart';
+import 'DatabaseHelper.dart';
 
 class EditProfile extends StatefulWidget {
-  final Loginrespon currentUser;
+  final User currentUser;
 
   const EditProfile({Key? key, required this.currentUser}) : super(key: key);
 
@@ -23,13 +21,11 @@ class EditProfileState extends State<EditProfile> {
   late TextEditingController _tanggalLahirController;
   late TextEditingController _noHpController;
 
-
+  final _databaseHelper = DatabaseHelper(); // Kelas untuk mengelola database SQFlite
 
   @override
   void initState() {
     super.initState();
-
-    // Mengisi controller dengan data dari currentUser
     _usernameController =
         TextEditingController(text: widget.currentUser.username);
     _emailController = TextEditingController(text: widget.currentUser.email);
@@ -56,7 +52,7 @@ class EditProfileState extends State<EditProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Profile'),
+        title: Text('Edit Profil'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -90,44 +86,27 @@ class EditProfileState extends State<EditProfile> {
             SizedBox(height: 16),
             TextFormField(
               controller: _noHpController,
-              decoration: InputDecoration(labelText: 'No Hp'),
+              decoration: InputDecoration(labelText: 'No HP'),
             ),
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () async {
-                // Mengonversi nilai nomor HP ke tipe data int
-                int? noHp = int.tryParse(_noHpController.text);
-                if (noHp == null) {
-                  // Handle jika konversi gagal, misalnya menampilkan pesan kesalahan
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Nomor HP tidak valid'),
-                    ),
-                  );
-                  return;
-                }
-
-                // Membuat objek updatedUser dengan data yang ingin diperbarui
-                User updatedUser = User(
+                // Menyiapkan data pengguna yang akan diperbarui
+                final updatedUser = User(
+                  id: widget.currentUser.id,
                   username: _usernameController.text,
                   email: _emailController.text,
                   alamat: _alamatController.text,
-                  agama: widget.currentUser.agama??'',
-                  tanggal_lahir: widget.currentUser.tanggalLahir??'',
-                  no_hp: widget.currentUser.noHp??'',
-                  name: widget.currentUser.name??'',
-                  id: widget.currentUser.id!,
+                  agama: _agamaController.text,
+                  tanggalLahir: _tanggalLahirController.text,
+                  noHp: _noHpController.text,
                 );
+                
+                // Memperbarui data pengguna di database
+                await _databaseHelper.updateProfile(updatedUser);
 
-                // Panggil method updateUser dari DB Helper SQFlite dengan objek updatedUser sebagai argumen
-                await DatabaseHelper().updateUserByUsername(updatedUser);
-
-                // Tampilkan pesan berhasil
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Profil berhasil diperbarui'),
-                  ),
-                );
+                // Kembali ke halaman sebelumnya
+                Navigator.pop(context);
               },
               child: Text('Simpan'),
             ),

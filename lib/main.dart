@@ -2,18 +2,16 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/LupaPassword.dart';
-import 'package:mobile/models/user.dart';
 import 'package:mobile/register.dart';
 import 'HomePage.dart';
 import 'package:mobile/view/Home.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite_common/sqlite_api.dart';
-import 'package:mobile/models/loginrespon.dart';
+import 'package:mobile/models/login_response/login_response.dart';
+import 'package:mobile/models/login_response/user.dart';
 
 void main() {
   runApp(const MainApp());
-  sqfliteFfiInit();
-  databaseFactory = databaseFactoryFfi;
 }
 
 class MainApp extends StatelessWidget {
@@ -208,7 +206,7 @@ class _LoginPageState extends State<LoginPage> {
       // Kirim permintaan HTTP ke server untuk verifikasi login
       var response = await http.get(
         Uri.parse(
-            'http://127.0.0.1:8000/api/login-mobile?email=$email&password=$password'),
+            'http://10.0.2.2:8000/api/login-mobile?email=$email&password=$password'),
       );
 
       // Periksa status kode respons
@@ -218,12 +216,15 @@ class _LoginPageState extends State<LoginPage> {
           // Login berhasil
           // Ambil data pengguna dari respons
           // User user = User.fromJson(responseData);
-          Loginrespon loginrespon = Loginrespon.fromMap(responseData);
+
+          LoginResponse loginResponse = LoginResponse.fromMap(responseData);
+          User? user = loginResponse.user;
+          // LoginResponse loginResponse = LoginResponse.fromJson(responseData);
 
           // Teruskan data pengguna ke halaman beranda
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => HomePage(home:loginrespon)),
+            MaterialPageRoute(builder: (contex) => HomePage(homePage: user!)),
           );
         } else {
           // Login gagal

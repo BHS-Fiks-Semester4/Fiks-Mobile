@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/models/user.dart';
 import 'package:mobile/view/editprofile.dart';
-import 'package:mobile/models/loginrespon.dart';
+import 'package:mobile/models/login_response/user.dart';
 
-class Profile extends StatefulWidget {
-  final Loginrespon user;
+class Profile extends StatelessWidget {
+  final User user;
+
   const Profile({Key? key, required this.user}) : super(key: key);
 
-  @override
-  State<Profile> createState() => _ProfileState();
-}
-
-class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +30,7 @@ class _ProfileState extends State<Profile> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.user.name??'',
+                          user.name ?? '',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -47,120 +42,49 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
               SizedBox(height: 20),
-              Container(
-                width: 430,
-                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                child: TextField(
-                  controller:
-                      TextEditingController(text: '${widget.user.username}'),
-                  style: TextStyle(fontSize: 16, color: Colors.black),
-                  enabled: false,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Username',
-                    prefix: Icon(Icons.person),
-                    labelStyle: TextStyle(color: Colors.black),
-                  ),
-                ),
-              ),
+              buildTextField('Username', user.username),
               SizedBox(height: 15),
-              Container(
-                width: 430,
-                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                child: TextField(
-                  controller:
-                      TextEditingController(text: '${widget.user.alamat}'),
-                  style: TextStyle(fontSize: 16, color: Colors.black),
-                  enabled: false,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Alamat',
-                    prefix: Icon(Icons.location_city),
-                    labelStyle: TextStyle(color: Colors.black),
-                  ),
-                ),
-              ),
+              buildTextField('Alamat', user.alamat),
               SizedBox(height: 20),
-              Container(
-                width: 430,
-                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                child: TextField(
-                  controller: TextEditingController(
-                      text: '${widget.user.tanggalLahir}'),
-                  style: TextStyle(fontSize: 16, color: Colors.black),
-                  enabled: false,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Tanggal Lahir',
-                    prefix: Icon(Icons.person),
-                    labelStyle: TextStyle(color: Colors.black),
-                  ),
-                ),
-              ),
+              buildTextField('Tanggal Lahir', user.tanggalLahir),
               SizedBox(height: 20),
-              Container(
-                width: 430,
-                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                child: TextField(
-                  controller:
-                      TextEditingController(text: '${widget.user.agama}'),
-                  style: TextStyle(fontSize: 16, color: Colors.black),
-                  enabled: false,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Agama',
-                    prefix: Icon(Icons.person),
-                    labelStyle: TextStyle(color: Colors.black),
-                  ),
-                ),
-              ),
+              buildTextField('Agama', user.agama),
               SizedBox(height: 20),
-              Container(
-                width: 430,
-                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                child: TextField(
-                  controller:
-                      TextEditingController(text: '${widget.user.email}'),
-                  style: TextStyle(fontSize: 16, color: Colors.black),
-                  enabled: false,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Email',
-                    prefix: Icon(Icons.person),
-                    labelStyle: TextStyle(color: Colors.black),
-                  ),
-                ),
-              ),
-              Container(
-                width: 430,
-                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                child: TextField(
-                  controller:
-                      TextEditingController(text: '${widget.user.noHp}'),
-                  style: TextStyle(fontSize: 16, color: Colors.black),
-                  enabled: false,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'No Hp',
-                    prefix: Icon(Icons.person),
-                    labelStyle: TextStyle(color: Colors.black),
-                  ),
-                ),
-              ),
+              buildTextField('Email', user.email),
+              SizedBox(height: 20),
+              buildTextField('No Hp', user.noHp),
               SizedBox(height: 10),
-               ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EditProfile(currentUser: widget.user),
-                  ),
-                );
-              },
-              child: Text('Edit Profile'),
-            ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditProfile(currentUser: user),
+                    ),
+                  );
+                },
+                child: Text('Edit Profile'),
+              ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildTextField(String labelText, String? value) {
+    return Container(
+      width: 430,
+      padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+      child: TextField(
+        controller: TextEditingController(text: value),
+        style: TextStyle(fontSize: 16, color: Colors.black),
+        enabled: false,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: labelText,
+          prefix: Icon(Icons.person),
+          labelStyle: TextStyle(color: Colors.black),
         ),
       ),
     );
