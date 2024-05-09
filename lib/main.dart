@@ -10,6 +10,7 @@ import 'package:sqflite_common/sqlite_api.dart';
 import 'package:mobile/models/login_response/login_response.dart';
 import 'package:mobile/models/login_response/user.dart';
 
+
 void main() {
   runApp(const MainApp());
 }

@@ -17,8 +17,9 @@ dependencies:
   http: ^0.13.3
   json_annotation: ^4.9.0
   json_serializable: ^6.8.0
-  sqflite: ^2.3.3
+  sqflite: ^2.3.3+1
   sqflite_common_ffi: ^2.3.3
+  
 
 
 dev_dependencies:
@@ -35,3 +36,4 @@ flutter:
   assets:
     - assets/poto.png
     - assets/logo.png
+

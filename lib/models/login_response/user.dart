@@ -53,4 +53,10 @@ class User {
   ///
   /// Converts [User] to a JSON string.
 	String toJson() => json.encode(toMap());
+
+
+  @override
+  String toString() {
+    return 'User{id: $id, name: $name, email: $email, alamat: $alamat, username: $username, noHp: $noHp, agama: $agama, tanggalLahir: $tanggalLahir}';
+  }
 }
