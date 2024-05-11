@@ -28,11 +28,13 @@ class EditProfileState extends State<EditProfile> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.currentUser.name);
-    _usernameController = TextEditingController(text: widget.currentUser.username);
+    _usernameController =
+        TextEditingController(text: widget.currentUser.username);
     _emailController = TextEditingController(text: widget.currentUser.email);
     _alamatController = TextEditingController(text: widget.currentUser.alamat);
     _agamaController = TextEditingController(text: widget.currentUser.agama);
-    _tanggalLahirController = TextEditingController(text: widget.currentUser.tanggalLahir);
+    _tanggalLahirController =
+        TextEditingController(text: widget.currentUser.tanggalLahir);
     _noHpController = TextEditingController(text: widget.currentUser.noHp);
   }
 
@@ -62,40 +64,88 @@ class EditProfileState extends State<EditProfile> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: InputDecoration(labelText: 'Name'),
+                style: TextStyle(fontSize: 16, color: Colors.black),
+                decoration: InputDecoration(
+                    labelText: 'Name',
+                    border: OutlineInputBorder(),
+                    labelStyle: TextStyle(color: Colors.black),
+                    prefixIcon: Icon(Icons.person),
+                    enabled: false),
               ),
               SizedBox(height: 16),
               TextFormField(
                 controller: _usernameController,
-                decoration: InputDecoration(labelText: 'Username'),
+                decoration: InputDecoration(
+                  labelText: 'Username',
+                  border: OutlineInputBorder(),
+                  labelStyle: TextStyle(color: Colors.black),
+                  prefixIcon: Icon(Icons.person),
+                ),
               ),
               SizedBox(height: 16),
               TextFormField(
                 controller: _emailController,
-                decoration: InputDecoration(labelText: 'Email'),
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  border: OutlineInputBorder(),
+                  labelStyle: TextStyle(color: Colors.black),
+                  prefixIcon: Icon(Icons.email),
+                ),
               ),
               SizedBox(height: 16),
               TextFormField(
                 controller: _alamatController,
-                decoration: InputDecoration(labelText: 'Alamat'),
+                decoration: InputDecoration(
+                  labelText: 'Alamat',
+                  border: OutlineInputBorder(),
+                  labelStyle: TextStyle(color: Colors.black),
+                  prefixIcon: Icon(Icons.maps_home_work),
+                ),
               ),
               SizedBox(height: 16),
               TextFormField(
                 controller: _agamaController,
-                decoration: InputDecoration(labelText: 'Agama'),
+                style: TextStyle(fontSize: 16, color: Colors.black),
+                decoration: InputDecoration(
+                    labelText: 'Agama',
+                    border: OutlineInputBorder(),
+                    labelStyle: TextStyle(color: Colors.black),
+                    prefixIcon: Icon(Icons.star),
+                    enabled: false),
               ),
               SizedBox(height: 16),
               TextFormField(
                 controller: _tanggalLahirController,
-                decoration: InputDecoration(labelText: 'Tanggal Lahir'),
+                style: TextStyle(fontSize: 16, color: Colors.black),
+                decoration: InputDecoration(
+                  labelText: 'Tanggal Lahir',
+                  border: OutlineInputBorder(),
+                  labelStyle: TextStyle(color: Colors.black),
+                  prefixIcon: Icon(Icons.calendar_month),
+                  enabled: false
+                ),
               ),
               SizedBox(height: 16),
               TextFormField(
                 controller: _noHpController,
-                decoration: InputDecoration(labelText: 'No HP'),
+                decoration: InputDecoration(
+                  labelText: 'No HP',
+                  border: OutlineInputBorder(),
+                  labelStyle: TextStyle(color: Colors.black),
+                  prefixIcon: Icon(Icons.phone),
+                ),
               ),
               SizedBox(height: 16),
               ElevatedButton(
+                style: ButtonStyle(
+                    minimumSize: MaterialStateProperty.all(Size(420, 50)),
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.pink),
+                    foregroundColor:
+                        MaterialStateProperty.all<Color>(Colors.white),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)))),
                 onPressed: () async {
                   // Menyiapkan data pengguna yang akan diperbarui
                   final updatedUser = User(
@@ -114,16 +164,16 @@ class EditProfileState extends State<EditProfile> {
 
                   // Kirim permintaan pembaruan profil ke server
                   final response = await http.put(
-                    Uri.parse('http://10.0.2.2:8000/api/users/${updatedUser.id}'),
+                    Uri.parse(
+                        'http://10.0.2.2:8000/api/users/${updatedUser.id}'),
                     headers: {'Content-Type': 'application/json'},
                     body: jsonEncode(updatedUser.toMap()),
                   );
 
                   if (response.statusCode == 200) {
-                    
                     // Berhasil memperbarui profil
                     print('User profile updated successfully');
-                    
+
                     Navigator.pop(context, updatedUser);
                   } else {
                     // Gagal memperbarui profilx`

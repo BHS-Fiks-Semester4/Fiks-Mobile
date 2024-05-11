@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/main.dart';
+import 'package:quickalert/quickalert.dart';
 
 class Register extends StatefulWidget {
   final String? emailFromRegister;
@@ -52,13 +53,14 @@ class _RegisterState extends State<Register> {
                         child: Text(
                           'Register',
                           style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.pink
-                          ),
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.pink),
                         ),
                       ),
-                      SizedBox(height: 16,),
+                      SizedBox(
+                        height: 16,
+                      ),
                       Container(
                         width: 300,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -80,7 +82,6 @@ class _RegisterState extends State<Register> {
                           ),
                         ),
                       ),
-                      
                       Container(
                         width: 300,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -123,7 +124,6 @@ class _RegisterState extends State<Register> {
                           ),
                         ),
                       ),
-                      
                       Container(
                         width: 300,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -280,7 +280,7 @@ class _RegisterState extends State<Register> {
                           ),
                         ),
                       ),
-                       Container(
+                      Container(
                         width: 300,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                         child: TextFormField(
@@ -327,17 +327,20 @@ class _RegisterState extends State<Register> {
                           }
                         },
                         style: ButtonStyle(
-                          minimumSize: MaterialStateProperty.all(Size(290, 50)),
-                          backgroundColor: MaterialStateProperty.all<Color>(Colors.pink),
-                          foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)
-                          ))
-                        ),
+                            minimumSize:
+                                MaterialStateProperty.all(Size(290, 50)),
+                            backgroundColor:
+                                MaterialStateProperty.all<Color>(Colors.pink),
+                            foregroundColor:
+                                MaterialStateProperty.all<Color>(Colors.white),
+                            shape: MaterialStateProperty.all<
+                                    RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)))),
                         child: Text(
                           'Submit',
                           style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -350,11 +353,13 @@ class _RegisterState extends State<Register> {
                             style: TextStyle(color: Colors.grey.shade600),
                           ),
                           InkWell(
-                            onTap: (){
+                            onTap: () {
                               Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => MainApp(),),
-                            );
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MainApp(),
+                                ),
+                              );
                             },
                             child: Text(
                               'Login',
@@ -410,61 +415,91 @@ class _RegisterState extends State<Register> {
     }
   }
 
- Future<void> _verifyLogin(
-  String namaLengkap,
-  String username,
-  String alamat,
-  String email,
-  String password,
-  String confirmPassword,
-  String tanggalLahir,
-  String agama,
-  String noHP) async {
-  
-  try {
-    var response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/api/register-mobile'),
-      body: {
-        'name': namaLengkap, // Ubah namaLengkap menjadi name sesuai dengan backend
-        'username': username,
-        'alamat': alamat,
-        'email': email,
-        'password': password,
-        'confirmPassword': confirmPassword, // Konfirmasi password tidak diperlukan di sini
-        'tanggal_lahir': tanggalLahir, // Ubah tanggalLahir menjadi tanggal_lahir sesuai dengan backend
-        'agama': agama,
-        'no_hp': noHP, // Ubah noHP menjadi no_hp sesuai dengan backend
-      },
-    );
+  Future<void> _verifyLogin(
+      String namaLengkap,
+      String username,
+      String alamat,
+      String email,
+      String password,
+      String confirmPassword,
+      String tanggalLahir,
+      String agama,
+      String noHP) async {
+    try {
+      var response = await http.post(
+        Uri.parse('http://127.0.0.1:8000/api/register-mobile'),
+        body: {
+          'name': namaLengkap,
+          'username': username,
+          'alamat': alamat,
+          'email': email,
+          'password': password,
+          'confirmPassword': confirmPassword,
+          'tanggal_lahir': tanggalLahir,
+          'agama': agama,
+          'no_hp': noHP,
+        },
+      );
 
-    if (response.statusCode == 201) { // Perubahan status code sesuai dengan respons yang diharapkan dari backend
-      var responseData = jsonDecode(response.body);
-      if (responseData['status'] == 'success') { // Ubah pengecekan status sesuai dengan respons dari backend
-         Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => LoginPage(email: email),
-          ),
+      if (response.statusCode == 201) {
+        var responseData = jsonDecode(response.body);
+
+        if (responseData['status'] == 'success') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LoginPage(email: email),
+            ),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(responseData['message'])),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(responseData['message'])),
+          );
+          // Menampilkan quick_alert
+          QuickAlert.show(
+          context: context,
+          type: QuickAlertType.warning,
+          text: 'The email has already been taken',
         );
+        }
+      } else if (response.statusCode == 400) {
+        // Email sudah terdaftar
+        var responseData = jsonDecode(response.body);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(responseData['message'])),
         );
-       
+        // Menampilkan quick_alert
+        // quickAlert(context, responseData['message']);
+        QuickAlert.show(
+          context: context,
+          type: QuickAlertType.success,
+          text: 'Login Successful!',
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(responseData['message'])),
+          SnackBar(content: Text('The email has already been taken')),
+        );
+        // Menampilkan quick_alert
+        // quickAlert(context, 'The email has already been taken');
+         QuickAlert.show(
+          context: context,
+          type: QuickAlertType.warning,
+          text: 'The email has already been taken',
         );
       }
-    } else {
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to connect to the server')),
+        SnackBar(content: Text('An error occurred: $e')),
+        
       );
+      QuickAlert.show(
+          context: context,
+          type: QuickAlertType.error,
+          text: 'eror',
+        );
     }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('An error occurred: $e')),
-    );
   }
-}
-
 }

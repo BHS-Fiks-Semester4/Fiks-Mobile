@@ -72,7 +72,8 @@ class _ProfileState extends State<Profile> {
                   final updatedUser = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => EditProfile(currentUser: _currentUser),
+                      builder: (context) =>
+                          EditProfile(currentUser: _currentUser),
                     ),
                   );
                   if (updatedUser != null) {
@@ -81,8 +82,20 @@ class _ProfileState extends State<Profile> {
                     });
                   }
                 },
+                style: ButtonStyle(
+                    minimumSize: MaterialStateProperty.all(Size(420, 50)),
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.pink),
+                    foregroundColor:
+                        MaterialStateProperty.all<Color>(Colors.white),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)))),
                 child: Text('Edit Profile'),
               ),
+              SizedBox(
+                height: 30,
+              )
             ],
           ),
         ),
@@ -91,6 +104,33 @@ class _ProfileState extends State<Profile> {
   }
 
   Widget buildTextField(String labelText, String? value) {
+    IconData? iconData;
+
+    // Tentukan ikon berdasarkan label teks
+    switch (labelText) {
+      case 'Username':
+        iconData = Icons.person;
+        break;
+      case 'Alamat':
+        iconData = Icons.home;
+        break;
+      case 'Tanggal Lahir':
+        iconData = Icons.calendar_today;
+        break;
+      case 'Agama':
+        iconData = Icons.star;
+        break;
+      case 'Email':
+        iconData = Icons.email;
+        break;
+      case 'No Hp':
+        iconData = Icons.phone;
+        break;
+      default:
+        iconData = null;
+    }
+
+    // Kembalikan widget TextFormField dengan konfigurasi dekorasi dan nilai
     return Container(
       width: 430,
       padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -101,7 +141,8 @@ class _ProfileState extends State<Profile> {
         decoration: InputDecoration(
           border: OutlineInputBorder(),
           labelText: labelText,
-          prefix: Icon(Icons.person),
+          prefixIcon:
+              iconData != null ? Icon(iconData) : null, // Tambahkan ikon
           labelStyle: TextStyle(color: Colors.black),
         ),
       ),

@@ -6,11 +6,11 @@ import 'package:mobile/view/Management.dart';
 import 'package:mobile/view/Report.dart';
 import 'package:mobile/view/Home.dart';
 import 'package:mobile/models/login_response/user.dart';
-
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:mobile/main.dart';
 
 class HomePage extends StatefulWidget {
   final User homePage;
-  
 
   const HomePage({Key? key, required this.homePage}) : super(key: key);
 
@@ -20,7 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey _key = GlobalKey();
 
   @override
@@ -29,39 +29,24 @@ class _HomePageState extends State<HomePage> {
       body: Center(
         child: _getBody(),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey.shade300,
-        currentIndex: _currentIndex,
+      bottomNavigationBar: CurvedNavigationBar(
+        backgroundColor: Color.fromRGBO(255, 255, 255, 1),
+        color: Color.fromRGBO(253, 0, 107, 1),
+        buttonBackgroundColor: Color.fromRGBO(253, 0, 107, 1),
+        height: 50,
+        animationDuration: Duration(milliseconds: 200),
+        index: _currentIndex,
         onTap: (int newIndex) {
           setState(() {
             _currentIndex = newIndex;
           });
         },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.home,
-              color: Colors.black,
-            ),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.data_usage, color: Colors.black),
-            label: 'Data',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle, color: Colors.black),
-            label: 'Transaksi',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.insert_chart, color: Colors.black),
-            label: 'Laporan',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person, color: Colors.black),
-            label: 'Profil',
-          ),
+        items: <Widget>[
+          Icon(Icons.home, size: 30, color: Colors.white),
+          Icon(Icons.data_usage, size: 30, color: Colors.white),
+          Icon(Icons.add_circle, size: 30, color: Colors.white),
+          Icon(Icons.insert_chart, size: 30, color: Colors.white),
+          Icon(Icons.person, size: 30, color: Colors.white),
         ],
       ),
     );
