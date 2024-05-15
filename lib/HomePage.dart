@@ -8,6 +8,9 @@ import 'package:mobile/view/Home.dart';
 import 'package:mobile/models/login_response/user.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:mobile/main.dart';
+import 'package:mobile/models/DataBarang.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class HomePage extends StatefulWidget {
   final User homePage;
@@ -20,8 +23,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final GlobalKey _key = GlobalKey();
+  List<Barang> listBarang = [];
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -57,15 +60,77 @@ class _HomePageState extends State<HomePage> {
       case 0:
         return Home();
       case 1:
-        return Management();
+        // return DataBarangWidget();
+        return isLoading
+            ? CircularProgressIndicator()
+            : DataBarangWidget(listBarang: listBarang);
       case 2:
         return Transaction();
       case 3:
         return Report();
+
       case 4:
         return Profile(user: widget.homePage);
       default:
         return Home();
     }
   }
+
+  @override
+  void initState() {
+    super.initState();
+    // Panggil API ketika halaman pertama kali dibuka
+    _fetchDataBarang();
+  }
+
+  void _fetchDataBarang() async {
+  setState(() {
+    isLoading = true;
+  });
+
+  try {
+    List<Barang> data = await getDataBarang();
+    setState(() {
+      listBarang = data;
+      isLoading = false;
+    });
+    print('Data barang berhasil dimuat: $listBarang');
+  } catch (e) {
+    setState(() {
+      isLoading = false;
+    });
+    // Tampilkan pesan kesalahan
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Gagal memuat data barang: $e')),
+    );
+  }
 }
+
+}
+Future<List<Barang>> getDataBarang() async {
+  final url = Uri.parse('http://10.0.2.2:8000/api/data_barang');
+
+  try {
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body)['barangs'];
+      List<Barang> barangs = [];
+      data.forEach((json) {
+        try {
+          final barang = Barang.fromJson(json);
+          barangs.add(barang);
+          print('Barang: $barang');
+        } catch (e) {
+          print('Error parsing barang: $e');
+        }
+      });
+      return barangs;
+    } else {
+      throw Exception('Gagal memuat data barang: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Gagal terhubung ke server: $e');
+  }
+}
+
+

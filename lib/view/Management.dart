@@ -1,83 +1,53 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:mobile/models/DataBarang.dart';
 
-class Management extends StatefulWidget {
-  const Management({super.key});
+class DataBarangWidget extends StatelessWidget {
+  final List<Barang> listBarang;
 
-  @override
-  State<Management> createState() => _ManagementState();
-}
+  const DataBarangWidget({Key? key, required this.listBarang}) : super(key: key);
 
-class _ManagementState extends State<Management> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey.shade300,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                ElevatedButton(
-                  onPressed: () {},
-                  child: Text('Tombol 1'),
-                ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: Text('Tombol 2'),
-                ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: Text('Tombol 3'),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                ElevatedButton(
-                  onPressed: () {},
-                  child: Text('Tombol 4'),
-                ),
-                SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: Text('Tombol 5'),
-                ),
-                SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: Text('Tombol 6'),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                ElevatedButton(
-                  onPressed: () {},
-                  child: Text('Tombol 7'),
-                ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: Text('Tombol 8'),
-                ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: Text('Tombol 9'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+    return ListView.builder(
+      itemCount: listBarang.length,
+      itemBuilder: (context, index) {
+        final barang = listBarang[index];
+        return ListTile(
+          title: Text(barang.namaBarang),
+          subtitle: Text('Stok: ${barang.stokBarang}'),
+          leading: SizedBox(
+            width: 80,
+            height: 80,
+            child: _buildImage(barang.gambarBarang),
+          ),
+        );
+      },
     );
+  }
+
+  Widget _buildImage(String base64String) {
+    if (_isBase64(base64String)) {
+      try {
+        final decodedBytes = base64.decode(base64String);
+        return Image.memory(decodedBytes);
+      } catch (e) {
+        print('Error decoding base64 string: $e');
+        return Placeholder();
+      }
+    } else {
+      print('Invalid base64 string: $base64String');
+      return Placeholder();
+    }
+  }
+
+  bool _isBase64(String value) {
+    try {
+      base64.decode(value);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }
