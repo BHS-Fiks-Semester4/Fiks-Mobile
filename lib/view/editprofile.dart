@@ -165,7 +165,7 @@ class EditProfileState extends State<EditProfile> {
                   // Kirim permintaan pembaruan profil ke server
                   final response = await http.put(
                     Uri.parse(
-                        'http://10.0.2.2:8000/api/users/${updatedUser.id}'),
+                        'http://127.0.0.1:8000/api/users/${updatedUser.id}'),
                     headers: {'Content-Type': 'application/json'},
                     body: jsonEncode(updatedUser.toMap()),
                   );
