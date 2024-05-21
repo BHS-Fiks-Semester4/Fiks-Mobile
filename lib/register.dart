@@ -445,12 +445,20 @@ class _RegisterState extends State<Register> {
         var responseData = jsonDecode(response.body);
 
         if (responseData['status'] == 'success') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => LoginPage(email: email),
-            ),
+          QuickAlert.show(
+            context: context,
+            type: QuickAlertType.success,
+            text: 'Registrasi Berhasil',
           );
+          Future.delayed(Duration(seconds: 1), () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LoginPage(email: email),
+              ),
+            );
+          });
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(responseData['message'])),
           );
@@ -460,10 +468,10 @@ class _RegisterState extends State<Register> {
           );
           // Menampilkan quick_alert
           QuickAlert.show(
-          context: context,
-          type: QuickAlertType.warning,
-          text: 'The email has already been taken',
-        );
+            context: context,
+            type: QuickAlertType.warning,
+            text: 'The email has already been taken',
+          );
         }
       } else if (response.statusCode == 400) {
         // Email sudah terdaftar
@@ -484,7 +492,7 @@ class _RegisterState extends State<Register> {
         );
         // Menampilkan quick_alert
         // quickAlert(context, 'The email has already been taken');
-         QuickAlert.show(
+        QuickAlert.show(
           context: context,
           type: QuickAlertType.warning,
           text: 'The email has already been taken',
@@ -493,13 +501,12 @@ class _RegisterState extends State<Register> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('An error occurred: $e')),
-        
       );
       QuickAlert.show(
-          context: context,
-          type: QuickAlertType.error,
-          text: 'eror',
-        );
+        context: context,
+        type: QuickAlertType.error,
+        text: 'eror',
+      );
     }
   }
 }

@@ -222,11 +222,13 @@ class _LoginPageState extends State<LoginPage> {
             type: QuickAlertType.success,
             text: 'Login Successful!',
           );
+          Future.delayed(Duration(seconds: 1), () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (contex) => HomePage(homePage: user!)),
+            );
+          });
           // Teruskan data pengguna ke halaman beranda
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (contex) => HomePage(homePage: user!)),
-          );
         } else {
           // Login gagal
           QuickAlert.show(
