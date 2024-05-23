@@ -10,7 +10,8 @@ import 'package:sqflite_common/sqlite_api.dart';
 import 'package:mobile/models/login_response/login_response.dart';
 import 'package:mobile/models/login_response/user.dart';
 import 'package:quickalert/quickalert.dart';
-
+import 'package:mobile/view/DatabaseHelper.dart';
+import 'package:mobile/view/LupaPassword.dart';
 void main() {
   runApp(const MainApp());
 }
@@ -31,6 +32,7 @@ class LoginPage extends StatefulWidget {
   final String? email;
 
   const LoginPage({Key? key, this.email}) : super(key: key);
+  
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -168,12 +170,13 @@ class _LoginPageState extends State<LoginPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => lupaPassword()),
+                                  builder: (context) => LupaPassword()),
                             );
                           },
                           child: Text(
                             'Forgotten password?',
                             style: TextStyle(color: Colors.blue),
+
                           ),
                         ),
                         TextButton(
@@ -201,22 +204,27 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Future<void> _verifyLogin(
-      String email, String password, BuildContext context) async {
-    try {
-      // Kirim permintaan HTTP ke server untuk verifikasi login
-      var response = await http.get(
-        Uri.parse(
-            'http://127.0.0.1:8000/api/login-mobile?email=$email&password=$password'),
-      );
+ Future<void> _verifyLogin(String email, String password, BuildContext context) async {
+  try {
+    // Kirim permintaan HTTP ke server untuk verifikasi login
+    var response = await http.get(
+      Uri.parse('http://127.0.0.1:8000/api/login-mobile?email=$email&password=$password'),
+    );
 
-      // Periksa status kode respons
-      if (response.statusCode == 200) {
-        var responseData = jsonDecode(response.body);
-        if (responseData['status'] == 'success') {
-          // Login berhasil
-          LoginResponse loginResponse = LoginResponse.fromMap(responseData);
-          User? user = loginResponse.user;
+    // Periksa status kode respons
+    if (response.statusCode == 200) {
+      var responseData = jsonDecode(response.body);
+      LoginResponse loginResponse = LoginResponse.fromMap(responseData);
+      if (loginResponse.status == 'success') {
+        User? user = loginResponse.user;
+        if (user != null) {
+          user.id = responseData['id']; // Atur ID pengguna dari respons
+          
+          // Simpan data pengguna ke dalam database lokal
+          DatabaseHelper dbHelper = DatabaseHelper();
+          await dbHelper.insertUser(user);
+
+          print('User: $user');
           QuickAlert.show(
             context: context,
             type: QuickAlertType.success,
@@ -225,34 +233,35 @@ class _LoginPageState extends State<LoginPage> {
           Future.delayed(Duration(seconds: 1), () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (contex) => HomePage(homePage: user!)),
+              MaterialPageRoute(builder: (context) => HomePage(homePage: user!)),
             );
           });
-          // Teruskan data pengguna ke halaman beranda
-        } else {
-          // Login gagal
-          QuickAlert.show(
-            context: context,
-            type: QuickAlertType.error,
-            text: responseData['message'],
-          );
         }
       } else {
-        // Tangani kesalahan HTTP
         QuickAlert.show(
           context: context,
-          type: QuickAlertType.warning,
-          text: 'Email atau Password salah:',
+          type: QuickAlertType.error,
+          text: loginResponse.message ?? 'Login failed',
         );
       }
-    } catch (e) {
-      // Tangani kesalahan lainnya
-      print('Kesalahan: $e');
+    } else {
+      // Tangani kesalahan HTTP
       QuickAlert.show(
         context: context,
-        type: QuickAlertType.error,
-        text: 'Terjadi kesalahan saat melakukan login',
+        type: QuickAlertType.warning,
+        text: 'Email or Password is incorrect',
       );
     }
+  } catch (e) {
+    // Tangani kesalahan lainnya
+    print('Error: $e');
+    QuickAlert.show(
+      context: context,
+      type: QuickAlertType.error,
+      text: 'An error occurred while logging in',
+    );
   }
+}
+
+
 }

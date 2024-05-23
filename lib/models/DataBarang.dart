@@ -2,44 +2,65 @@ import 'dart:convert';
 
 class Barang {
   final int id;
+  final int idJenisBarang;
+  final int idSupplier;
   final String namaBarang;
   final int stokBarang;
-  final double hargaSatuanBarang;
-  final String garansi;
-  final int diskon;
-  final DateTime expDiskon;
-  final String idJenis;
-  final String gambarBarang; // Simpan gambar sebagai String
+  final int hargaBeliBarang;
+  final int hargaSebelumDiskonBarang;
+  final int diskonBarang;
+  final int hargaSetelahDiskonBarang;
+  final String expDiskonBarang;
+  final String garansiBarang;
+  final String deskripsiBarang;
+  final String fotoBarang; // Mengubah menjadi String untuk menyimpan base64 string
+  final String status;
+  final String? createdAt;
+  final String? updatedAt;
 
   Barang({
     required this.id,
+    required this.idJenisBarang,
+    required this.idSupplier,
     required this.namaBarang,
     required this.stokBarang,
-    required this.hargaSatuanBarang,
-    required this.garansi,
-    required this.diskon,
-    required this.expDiskon,
-    required this.idJenis,
-    required this.gambarBarang,
+    required this.hargaBeliBarang,
+    required this.hargaSebelumDiskonBarang,
+    required this.diskonBarang,
+    required this.hargaSetelahDiskonBarang,
+    required this.expDiskonBarang,
+    required this.garansiBarang,
+    required this.deskripsiBarang,
+    required this.fotoBarang,
+    required this.status,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory Barang.fromJson(Map<String, dynamic> json) {
-  return Barang(
-    id: json['id'] ?? 0, // Ganti 0 dengan nilai default yang sesuai
-    namaBarang: json['nama-barang'] ?? '', // Gunakan nilai default jika null
-    stokBarang: json['stok-barang'] ?? 0, // Ganti 0 dengan nilai default yang sesuai
-    hargaSatuanBarang: (json['harga-satuan-barang'] ?? 0).toDouble(), // Ganti 0 dengan nilai default yang sesuai
-    garansi: json['garansi'] ?? '', // Gunakan nilai default jika null
-    diskon: json['diskon'] ?? 0, // Ganti 0 dengan nilai default yang sesuai
-    expDiskon: DateTime.parse(json['exp-diskon'] ?? '2000-01-01'), // Gunakan tanggal default jika null
-    idJenis: json['id-jenis'] ?? '', // Gunakan nilai default jika null
-    gambarBarang: json['gambar-barang'] ?? '', // Gunakan nilai default jika null
-  );
-}
-
+    return Barang(
+      id: json['id'],
+      idJenisBarang: json['id_jenis_barang'],
+      idSupplier: json['id_supplier'],
+      namaBarang: json['nama_barang'],
+      stokBarang: json['stok_barang'],
+      hargaBeliBarang: json['harga_beli_barang'],
+      hargaSebelumDiskonBarang: json['harga_sebelum_diskon_barang'],
+      diskonBarang: json['diskon_barang'],
+      hargaSetelahDiskonBarang: json['harga_setelah_diskon_barang'],
+      expDiskonBarang: json['exp_diskon_barang'],
+      garansiBarang: json['garansi_barang'],
+      deskripsiBarang: json['deskripsi_barang'],
+      fotoBarang: json['foto_barang'], // Mendapatkan base64 string
+      status: json['status'],
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at'],
+    );
+  }
 
   static List<Barang> parseBarangs(String responseBody) {
-    final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+    final parsed =
+        jsonDecode(responseBody)['barangs'].cast<Map<String, dynamic>>();
     return parsed.map<Barang>((json) => Barang.fromJson(json)).toList();
   }
 }

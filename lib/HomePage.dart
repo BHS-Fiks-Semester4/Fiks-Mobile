@@ -46,7 +46,7 @@ class _HomePageState extends State<HomePage> {
         },
         items: <Widget>[
           Icon(Icons.home, size: 30, color: Colors.white),
-          Icon(Icons.data_usage, size: 30, color: Colors.white),
+        
           Icon(Icons.add_circle, size: 30, color: Colors.white),
           Icon(Icons.insert_chart, size: 30, color: Colors.white),
           Icon(Icons.person, size: 30, color: Colors.white),
@@ -60,17 +60,18 @@ class _HomePageState extends State<HomePage> {
       case 0:
         return Home();
       case 1:
+      return Transaction();
         // return DataBarangWidget();
-        return isLoading
-            ? CircularProgressIndicator()
-            : DataBarangWidget(listBarang: listBarang);
+        // return isLoading
+        //     ? CircularProgressIndicator()
+        //     : DataBarangWidget(listBarang: listBarang);
       case 2:
-        return Transaction();
-      case 3:
         return Report();
+      case 3:
+         return Profile(user: widget.homePage);
 
-      case 4:
-        return Profile(user: widget.homePage);
+    
+       
       default:
         return Home();
     }

@@ -14,27 +14,41 @@ class DatabaseHelper {
     _database = await openDatabase(
       join(await getDatabasesPath(), 'akhwat_computer2.db'),
       onCreate: (db, version) {
-        // Tidak perlu membuat tabel jika tabel sudah ada
+        // Membuat tabel user jika belum ada
         return db.execute(
-          "CREATE TABLE IF NOT EXISTS user(id INTEGER PRIMARY KEY, name TEXT, email TEXT, alamat TEXT, username TEXT, no_hp TEXT, agama TEXT, tanggal_lahir TEXT)",
+          "CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, name TEXT, email TEXT, alamat TEXT, username TEXT, no_hp TEXT, agama TEXT, tanggal_lahir TEXT)",
         );
       },
       version: 1,
     );
   }
 
-  Future<void> updateProfile(User user) async {
-    try{
-    final db = await database;
-    await db.update(
-      'user',
-      user.toMap(),
-      where: "id = ?",
-      whereArgs: [user.id],
-    );
-     print('Data user berhasil diperbarui di database.');
-  } catch (e) {
-    print('Terjadi kesalahan saat memperbarui data user di database: $e');
+  Future<void> insertUser(User user) async {
+    try {
+      final db = await database;
+      await db.insert(
+        'users',
+        user.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      print('Data user berhasil disimpan ke database.');
+    } catch (e) {
+      print('Terjadi kesalahan saat menyimpan data user ke database: $e');
+    }
   }
+
+  Future<void> updateProfile(User user) async {
+    try {
+      final db = await database;
+      await db.update(
+        'users',
+        user.toMap(),
+        where: "id = ?",
+        whereArgs: [user.id],
+      );
+      print('Data user berhasil diperbarui di database.');
+    } catch (e) {
+      print('Terjadi kesalahan saat memperbarui data user di database: $e');
+    }
   }
 }

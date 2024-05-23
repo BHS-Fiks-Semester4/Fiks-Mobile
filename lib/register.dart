@@ -470,7 +470,7 @@ class _RegisterState extends State<Register> {
           QuickAlert.show(
             context: context,
             type: QuickAlertType.warning,
-            text: 'The email has already been taken',
+            text: 'The email has already beena taken',
           );
         }
       } else if (response.statusCode == 400) {
@@ -487,9 +487,7 @@ class _RegisterState extends State<Register> {
           text: 'Login Successful!',
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('The email has already been taken')),
-        );
+        
         // Menampilkan quick_alert
         // quickAlert(context, 'The email has already been taken');
         QuickAlert.show(

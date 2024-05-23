@@ -1,17 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mobile/Main-Class/Laptop.dart';
-import 'package:mobile/view/Management.dart';
-
+import 'package:http/http.dart' as http; // Import package http
+import 'dart:convert'; // Import package json convert
+import 'package:mobile/view/kategori.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  const Home({Key? key}) : super(key: key); // Koreksi sintaks penulisan key
 
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
+  List<dynamic> kategoriBarang = []; // Variabel untuk menyimpan data kategori barang
+
+  // Fungsi untuk mengambil data kategori barang dari API
+  Future<void> fetchKategoriBarang() async {
+    final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/kategori'));
+    if (response.statusCode == 200) {
+      setState(() {
+        kategoriBarang = json.decode(response.body)['kategoris'];
+      });
+    } else {
+      throw Exception('Failed to load kategori barang');
+    }
+  }
+
+  @override
+  void initState() {
+    fetchKategoriBarang(); // Panggil fungsi fetchKategoriBarang saat widget diinisialisasi
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,16 +127,14 @@ class _HomeState extends State<Home> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    _buildCard(context, 'Laptop', Icons.laptop, Laptop()),
-                    _buildCard(context, 'HardWare', Icons.hardware,Recyclerview()),
-
-                    _buildCard(context, 'Barang', Icons.repartition, cctv()),
-                    _buildCard(
-                        context, 'Elektronik', Icons.devices, Elektronik()),
-                    _buildCard(
-                        context, 'Komputer', Icons.device_hub, Komputer()),
-                    _buildCard(
-                        context, 'Gadget', Icons.developer_board, Gadget()),
+                    // Menggunakan data kategoriBarang untuk membuat card
+                    for (var kategori in kategoriBarang)
+                      _buildCard(
+                        context,
+                        kategori['nama_jenis_barang'],
+                        Icons.category, // Atur icon sesuai kebutuhan
+                        kategori['id'], // Atur widget sesuai kebutuhan
+                      ),
                   ],
                 ),
               ),
@@ -154,7 +172,7 @@ class _HomeState extends State<Home> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                                        children: [
                       Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -256,149 +274,58 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildCard(
-      BuildContext context, String title, IconData icon, Widget Laptop) {
-    return Container(
-      margin: EdgeInsets.all(8.0),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => Laptop),
-          );
-        },
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+   Widget _buildCard(BuildContext context, String title, IconData icon, int id) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailKategori(id: id), // Tambahkan halaman detail kategori
           ),
-          elevation: 2,
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                Icon(icon, size: 50, color: Colors.pink),
-                SizedBox(height: 10),
-                Text(
-                  title,
-                  style: GoogleFonts.getFont(
-                    'Inria Sans',
-                    fontWeight: FontWeight.w700,
-                    fontSize: 18,
-                    height: 1.3,
-                    color: Color(0xFFFD006B),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 8.0),
+        width: 150,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: Offset(0, 2),
             ),
+          ],
+        ),
+        child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Ganti ikon default dengan ikon kustom
+          Image.asset(
+            'assets/logo.png', // Lokasi gambar ikon kustom
+            width: 50,
+            height: 50,
+            color: Colors.blue, // Atur warna ikon kustom jika diperlukan
           ),
+            SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-Widget _buildCard(
-    BuildContext context, String title, IconData icon, Widget Recyclerview) {
-  return Container(
-    margin: EdgeInsets.all(8.0),
-    child: InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => Recyclerview),
-        );
-      },
-    ),
-  );
-}
+// Class untuk Halaman Detail Kategori
+
 
 void main() {
   runApp(MaterialApp(
     home: Home(),
   ));
-}
-
-// Kelas-kelas dummy untuk target navigasi
-class Hardware extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Hardware"),
-      ),
-      body: Center(
-        child: Text("Halaman Hardware"),
-      ),
-    );
-  }
-}
-
-class cctv extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Barang"),
-      ),
-      body: Center(
-        child: Text("Halaman Barang"),
-      ),
-    );
-  }
-}
-
-class Elektronik extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Elektronik"),
-      ),
-      body: Center(
-        child: Text("Halaman Elektronik"),
-      ),
-    );
-  }
-}
-
-class Komputer extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Komputer"),
-      ),
-      body: Center(
-        child: Text("Halaman Komputer"),
-      ),
-    );
-  }
-}
-
-class Gadget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Gadget"),
-      ),
-      body: Center(
-        child: Text("Halaman Gadget"),
-      ),
-    );
-  }
-}
-class Recyclerview extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Gadget"),
-      ),
-      body: Center(
-        child: Text("Halaman Gadget"),
-      ),
-    );
-  }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/models/login_response/user.dart';
 import 'package:http/http.dart' as http;
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite_common/sqlite_api.dart';
 import 'dart:convert';
 import 'DatabaseHelper.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -63,28 +65,28 @@ class EditProfileState extends State<EditProfile> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Positioned(
-                top: 82,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Color(0xFFD9D9D9),
-                    borderRadius: BorderRadius.circular(39),
-                  ),
-                  child: Container(
-                    width: 78,
-                    height: 78,
-                    padding: EdgeInsets.fromLTRB(16.3, 12.7, 15.7, 19.3),
-                    child: SizedBox(
-                      width: 46,
-                      height: 46,
-                      child: SvgPicture.network(
-                        'assets/vectors/vector_56_x2.svg',
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
+              // Positioned(
+              //   top: 82,
+              //   child: Container(
+              //     decoration: BoxDecoration(
+              //       color: Color(0xFFD9D9D9),
+              //       borderRadius: BorderRadius.circular(39),
+              //     ),
+              //     child: Container(
+              //       width: 78,
+              //       height: 78,
+              //       padding: EdgeInsets.fromLTRB(16.3, 12.7, 15.7, 19.3),
+              //       child: SizedBox(
+              //         width: 46,
+              //         height: 46,
+              //         child: SvgPicture.network(
+              //           'assets/vectors/vector_56_x2.svg',
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              // SizedBox(height: 20),
               TextFormField(
                 controller: _nameController,
                 style: TextStyle(fontSize: 16, color: Colors.black),
@@ -179,6 +181,7 @@ class EditProfileState extends State<EditProfile> {
                     tanggalLahir: _tanggalLahirController.text,
                     noHp: _noHpController.text,
                     name: _nameController.text,
+                    
                   );
 
                   // Memperbarui data pengguna di database lokal
