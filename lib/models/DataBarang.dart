@@ -17,6 +17,7 @@ class Barang {
   final String status;
   final String? createdAt;
   final String? updatedAt;
+  final int jumlah; // Menambahkan bidang jumlah
 
   Barang({
     required this.id,
@@ -35,6 +36,7 @@ class Barang {
     required this.status,
     this.createdAt,
     this.updatedAt,
+    this.jumlah = 0, // Menginisialisasi jumlah dengan 0
   });
 
   factory Barang.fromJson(Map<String, dynamic> json) {

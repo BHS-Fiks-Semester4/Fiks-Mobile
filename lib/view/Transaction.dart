@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/Main-Class/Penjualan.dart';
+import 'package:mobile/models/DataBarang.dart';
+import 'package:mobile/view/BarangTransaksi.dart';
 import 'package:mobile/Main-Class/Service.dart';
+import 'package:http/http.dart' as http;
 
 class Transaction extends StatefulWidget {
   const Transaction({Key? key}) : super(key: key);
@@ -10,6 +12,26 @@ class Transaction extends StatefulWidget {
 }
 
 class _TransactionState extends State<Transaction> {
+  List<Barang> _listBarang = [];
+
+  Future<void> fetchBarang() async {
+    final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/data_barang'));
+
+    if (response.statusCode == 200) {
+      setState(() {
+        _listBarang = Barang.parseBarangs(response.body);
+      });
+    } else {
+      throw Exception('Failed to load barangs');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchBarang();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,9 +52,8 @@ class _TransactionState extends State<Transaction> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Penjualan()),
+                      MaterialPageRoute(builder: (context) => BarangTransaksi(listBarang: _listBarang)),
                     );
-                    // Add your button 1 functionality here
                   },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(
@@ -43,8 +64,7 @@ class _TransactionState extends State<Transaction> {
                             vertical: 15)), // Change button padding
                     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(10.0), // Change border radius
+                        borderRadius: BorderRadius.circular(10.0), // Change border radius
                       ),
                     ),
                   ),
@@ -55,13 +75,11 @@ class _TransactionState extends State<Transaction> {
                     children: [
                       Icon(Icons.shopping_bag,
                           size: 80, color: Colors.pink), // Change icon color
-                      SizedBox(
-                          height: 10), // Add some spacing between icon and text
+                      SizedBox(height: 10), // Add some spacing between icon and text
                       Text('PENJUALAN',
                           style: TextStyle(
                               fontSize: 18,
-                              color: Colors
-                                  .black)), // Change button label size and color
+                              color: Colors.black)), // Change button label size and color
                     ],
                   ),
                 ),
@@ -82,8 +100,7 @@ class _TransactionState extends State<Transaction> {
                             vertical: 15)), // Change button padding
                     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(10.0), // Change border radius
+                        borderRadius: BorderRadius.circular(10.0), // Change border radius
                       ),
                     ),
                   ),
@@ -94,13 +111,11 @@ class _TransactionState extends State<Transaction> {
                     children: [
                       Icon(Icons.build,
                           size: 80, color: Colors.pink), // Change icon color
-                      SizedBox(
-                          height: 10), // Add some spacing between icon and text
+                      SizedBox(height: 10), // Add some spacing between icon and text
                       Text('SERVICE',
                           style: TextStyle(
                               fontSize: 18,
-                              color: Colors
-                                  .black)), // Change button label size and color
+                              color: Colors.black)), // Change button label size and color
                     ],
                   ),
                 ),

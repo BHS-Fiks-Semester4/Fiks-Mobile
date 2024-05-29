@@ -11,7 +11,7 @@ import 'package:mobile/models/login_response/login_response.dart';
 import 'package:mobile/models/login_response/user.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:mobile/view/DatabaseHelper.dart';
-import 'package:mobile/view/LupaPassword.dart';
+
 void main() {
   runApp(const MainApp());
 }
@@ -170,7 +170,7 @@ class _LoginPageState extends State<LoginPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => LupaPassword()),
+                                  builder: (context) => lupaPassword()),
                             );
                           },
                           child: Text(
