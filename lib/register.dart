@@ -427,7 +427,7 @@ class _RegisterState extends State<Register> {
       String noHP) async {
     try {
       var response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/api/register-mobile'),
+        Uri.parse('http://10.0.2.2:8000/api/register-mobile'),
         body: {
           'name': namaLengkap,
           'username': username,
@@ -458,38 +458,27 @@ class _RegisterState extends State<Register> {
               ),
             );
           });
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(responseData['message'])),
-          );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(responseData['message'])),
           );
-          // Menampilkan quick_alert
           QuickAlert.show(
             context: context,
             type: QuickAlertType.warning,
-            text: 'The email has already beena taken',
+            text: responseData['message'],
           );
         }
       } else if (response.statusCode == 400) {
-        // Email sudah terdaftar
         var responseData = jsonDecode(response.body);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(responseData['message'])),
         );
-        // Menampilkan quick_alert
-        // quickAlert(context, responseData['message']);
         QuickAlert.show(
           context: context,
-          type: QuickAlertType.success,
-          text: 'Login Successful!',
+          type: QuickAlertType.warning,
+          text: responseData['message'],
         );
       } else {
-        
-        // Menampilkan quick_alert
-        // quickAlert(context, 'The email has already been taken');
         QuickAlert.show(
           context: context,
           type: QuickAlertType.warning,
@@ -503,7 +492,7 @@ class _RegisterState extends State<Register> {
       QuickAlert.show(
         context: context,
         type: QuickAlertType.error,
-        text: 'eror',
+        text: 'Error occurred',
       );
     }
   }

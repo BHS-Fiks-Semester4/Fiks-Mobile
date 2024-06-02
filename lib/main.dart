@@ -208,7 +208,7 @@ class _LoginPageState extends State<LoginPage> {
   try {
     // Kirim permintaan HTTP ke server untuk verifikasi login
     var response = await http.get(
-      Uri.parse('http://127.0.0.1:8000/api/login-mobile?email=$email&password=$password'),
+      Uri.parse('http://10.0.2.2:8000/api/login-mobile?email=$email&password=$password'),
     );
 
     // Periksa status kode respons

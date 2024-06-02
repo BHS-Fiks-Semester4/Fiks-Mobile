@@ -1,3 +1,4 @@
+import 'package:mobile/models/Keranjang.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:mobile/models/DataTransaksi.dart';
@@ -58,7 +59,7 @@ class DatabaseHelper {
     }
   }
 
-  Future<void> simpanTransaksi(DataTransaksi transaksi) async {
+  Future<void> simpanTransaksi(Keranjang transaksi) async {
     try {
       final db = await database;
       await db.insert(

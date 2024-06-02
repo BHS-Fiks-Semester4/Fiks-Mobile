@@ -167,7 +167,7 @@ class DetailKategori extends StatelessWidget {
 
   Future<List<Barang>> fetchData(int id) async {
     final response =
-        await http.get(Uri.parse('http://127.0.0.1:8000/api/barang/$id'));
+        await http.get(Uri.parse('http://10.0.2.2:8000/api/barang/$id'));
     if (response.statusCode == 200) {
       List<dynamic> responseData = json.decode(response.body)['barangs'];
       return responseData.map((e) => Barang.fromJson(e)).toList();

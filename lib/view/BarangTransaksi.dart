@@ -16,6 +16,7 @@ class BarangTransaksi extends StatefulWidget {
 class _BarangTransaksiState extends State<BarangTransaksi> {
   int jumlahBarang = 0;
   double totalHarga = 0.0;
+  int qty = 0;
   Map<Barang, int> keranjang = {};
 
   void tambahBarang(Barang barang) {
@@ -48,7 +49,22 @@ class _BarangTransaksiState extends State<BarangTransaksi> {
   int jumlahBarangDalamKeranjang(Barang barang) {
     return keranjang.containsKey(barang) ? keranjang[barang]! : 0;
   }
-
+int getTotalQty(Map<Barang, int> keranjang) {
+    int totalQty = 0;
+    keranjang.forEach((barang, qty) {
+      totalQty += qty;
+    });
+    return totalQty;
+  }
+  Map<Barang, int> getBarangQtyMap() {
+  Map<Barang, int> barangQtyMap = {};
+  keranjang.forEach((barang, qty) {
+    if (qty > 0) {
+      barangQtyMap[barang] = qty;
+    }
+  });
+  return barangQtyMap;
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -214,15 +230,20 @@ class _BarangTransaksiState extends State<BarangTransaksi> {
                               ),
                             ),
                           ),
+                          
                           GestureDetector(
                             onTap: () {
+                            Map<Barang, int> barangQtyMap = getBarangQtyMap();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => TransaksiPage(
                                     keranjang: keranjang.keys.toList(),
+                                     barangQtyMap: barangQtyMap,
                                     totalHarga:
-                                        totalHarga, // Tambahkan totalHarga sebagai parameter
+                                        totalHarga,
+                                        qty: getTotalQty(keranjang), 
+                                    jumlahBarang: jumlahBarang, // Berikan nilai jumlahBarang di sini
                                   ),
                                 ),
                               );

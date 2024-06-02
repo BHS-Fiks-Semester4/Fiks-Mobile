@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile/models/DataBarang.dart';
-import 'package:mobile/models/DataTransaksi.dart'; // Sesuaikan dengan path proyek Anda
-
-
+import 'package:mobile/models/DataTransaksi.dart';
+import 'package:mobile/models/Keranjang.dart'; // Sesuaikan dengan path proyek Anda
 
 class TransaksiPage extends StatefulWidget {
   final List<Barang> keranjang;
   final double totalHarga;
+  final int qty;
+  final int jumlahBarang;
+  final Map<Barang, int> barangQtyMap;
 
   const TransaksiPage({
     Key? key,
     required this.keranjang,
     required this.totalHarga,
+    required this.qty,
+    required this.jumlahBarang,
+    required this.barangQtyMap, // Tambahkan barangQtyMap di sini
   }) : super(key: key);
 
   @override
@@ -23,6 +28,9 @@ class _TransaksiPageState extends State<TransaksiPage> {
   final _formKey = GlobalKey<FormState>();
   final _namaCustomerController = TextEditingController();
   final _bayarController = TextEditingController();
+  int jumlahBarangDalamKeranjang(Barang barang) {
+    return widget.keranjang.where((item) => item == barang).length;
+  }
 
   @override
   void dispose() {
@@ -34,7 +42,8 @@ class _TransaksiPageState extends State<TransaksiPage> {
   @override
   Widget build(BuildContext context) {
     double totalHarga = widget.totalHarga;
-    double totalQty = widget.keranjang.fold(0, (sum, item) => sum + item.jumlah);
+    int totalQty =
+        widget.keranjang.length; // Menghitung jumlah barang dalam keranjang
 
     return Scaffold(
       appBar: AppBar(
@@ -98,7 +107,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                       ),
                     ),
                     Text(
-                      'Qty',
+                      'Total Quantity',
                       style: GoogleFonts.getFont(
                         'Inria Sans',
                         fontWeight: FontWeight.w700,
@@ -139,7 +148,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                         ),
                       ),
                       Text(
-                        '${barang.jumlah}x',
+                        '${widget.barangQtyMap[barang]} x', // Menggunakan barangQtyMap
                         style: GoogleFonts.getFont(
                           'Inria Sans',
                           fontWeight: FontWeight.w700,
@@ -161,8 +170,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                     ],
                   ),
                 ),
-              // Total Harga
-              Container(
+                Container(
                 margin: EdgeInsets.fromLTRB(25, 0, 27, 12.5),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -199,7 +207,6 @@ class _TransaksiPageState extends State<TransaksiPage> {
                   ],
                 ),
               ),
-              // Form untuk Jumlah Bayar
               Container(
                 margin: EdgeInsets.fromLTRB(25, 0, 27, 12.5),
                 child: Column(
@@ -293,6 +300,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                   ],
                 ),
               ),
+
               // Tombol Submit
               Container(
                 margin: EdgeInsets.fromLTRB(26, 0, 26, 190),
@@ -304,13 +312,15 @@ class _TransaksiPageState extends State<TransaksiPage> {
                 child: InkWell(
                   onTap: () {
                     if (_formKey.currentState!.validate()) {
-                      DataTransaksi transaksi = DataTransaksi(
+                      Keranjang transaksi = Keranjang(
                         id: 'TRX123', // Sesuaikan dengan ID transaksi yang diinginkan
-                        idKaryawan: 'KRY123', // Sesuaikan dengan ID karyawan yang diinginkan
+                        idKaryawan:
+                            'KRY123', // Sesuaikan dengan ID karyawan yang diinginkan
                         totalHarga: totalHarga,
                         qty: totalQty,
                         bayar: double.parse(_bayarController.text),
-                        kembalian: (double.parse(_bayarController.text) - totalHarga),
+                        kembalian:
+                            (double.parse(_bayarController.text) - totalHarga),
                       );
 
                       // Implementasi penyimpanan ke database di sini menggunakan nilai transaksi

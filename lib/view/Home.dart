@@ -16,7 +16,7 @@ class _HomeState extends State<Home> {
 
   // Fungsi untuk mengambil data kategori barang dari API
   Future<void> fetchKategoriBarang() async {
-    final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/kategori'));
+    final response = await http.get(Uri.parse('http://10.0.2.2:8000/api/kategori'));
     if (response.statusCode == 200) {
       setState(() {
         kategoriBarang = json.decode(response.body)['kategoris'];

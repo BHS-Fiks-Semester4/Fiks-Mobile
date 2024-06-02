@@ -11,7 +11,7 @@ class Barang {
   final int diskonBarang;
   final int hargaSetelahDiskonBarang;
   final String expDiskonBarang;
-  final String garansiBarang;
+  final String? garansiBarang;
   final String deskripsiBarang;
   final String fotoBarang; // Mengubah menjadi String untuk menyimpan base64 string
   final String status;
@@ -30,7 +30,7 @@ class Barang {
     required this.diskonBarang,
     required this.hargaSetelahDiskonBarang,
     required this.expDiskonBarang,
-    required this.garansiBarang,
+    this.garansiBarang,
     required this.deskripsiBarang,
     required this.fotoBarang,
     required this.status,
