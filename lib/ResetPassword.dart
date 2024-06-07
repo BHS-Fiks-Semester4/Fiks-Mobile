@@ -2,39 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:mobile/ResetPassword.dart';
+import 'package:mobile/main.dart';
 
-class LupaPassword extends StatefulWidget {
-  const LupaPassword({Key? key}) : super(key: key);
+class ResetPassword extends StatefulWidget {
+  const ResetPassword({Key? key}) : super(key: key);
 
   @override
-  _LupaPasswordState createState() => _LupaPasswordState();
+  _ResetPasswordState createState() => _ResetPasswordState();
 }
 
-class _LupaPasswordState extends State<LupaPassword> {
+class _ResetPasswordState extends State<ResetPassword> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
+  final _otpController = TextEditingController();
+  final _passwordController = TextEditingController();
 
-  Future<void> _forgotPassword() async {
+  Future<void> _resetPassword() async {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/api/lupa'),
+      Uri.parse('http://10.0.2.2:8000/api/reset'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
         'email': _emailController.text,
+        'otp': _otpController.text,
+        'password': _passwordController.text,
       }),
     );
+        print(response.statusCode);
 
     if (response.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Check your email for the OTP')),
+        SnackBar(content: Text('Reset Password Success')),
       );
       
       // Navigasi ke halaman ResetPassword setelah berhasil mengirim OTP
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => ResetPassword()),
+        MaterialPageRoute(builder: (context) => LoginPage()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -47,7 +52,7 @@ class _LupaPasswordState extends State<LupaPassword> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Lupa Password'),
+        title: Text('Reset Password'),
       ),
       body: Center(
         child: Form(
@@ -68,10 +73,34 @@ class _LupaPasswordState extends State<LupaPassword> {
                     return null;
                   },
                 ),
+                TextFormField(
+                  controller: _otpController,
+                  decoration: const InputDecoration(
+                    labelText: 'OTP',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the OTP';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: const InputDecoration(
+                    labelText: 'New Password',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your new password';
+                    }
+                    return null;
+                  },
+                ),
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      _forgotPassword();
+                      _resetPassword();
                     }
                   },
                   child: const Text('Submit'),
