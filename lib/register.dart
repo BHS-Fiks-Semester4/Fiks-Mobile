@@ -427,7 +427,7 @@ class _RegisterState extends State<Register> {
       String noHP) async {
     try {
       var response = await http.post(
-        Uri.parse('http://10.0.2.2:8000/api/register-mobile'),
+        Uri.parse('http://127.0.0.1:8000/api/register-mobile'),
         body: {
           'name': namaLengkap,
           'username': username,

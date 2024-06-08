@@ -22,12 +22,28 @@ class DatabaseHelper {
         );
 
         // Membuat tabel transaksi jika belum ada
-        db.execute(
-          "CREATE TABLE IF NOT EXISTS transaksi(id TEXT PRIMARY KEY, id_karyawan TEXT, total_harga REAL, bayar REAL, kembalian REAL)",
-        );
       },
       version: 1,
     );
+  }
+
+  Future<int?> getLoggedInUserId() async {
+    try {
+      final db = await database;
+      final List<Map<String, dynamic>> maps = await db.query(
+        'users',
+        where: 'isLoggedIn = ?', // Asumsi ada kolom isLoggedIn
+        whereArgs: [1], // Asumsi 1 untuk true
+        limit: 1, // Karena hanya memerlukan satu user yang login
+      );
+      if (maps.isNotEmpty) {
+        // Asumsi kolom ID adalah 'id'
+        return maps.first['id'] as int;
+      }
+    } catch (e) {
+      print('Terjadi kesalahan saat mengambil ID user yang login: $e');
+    }
+    return null; // Kembalikan null jika tidak ada user yang login atau terjadi kesalahan
   }
 
   Future<void> insertUser(User user) async {

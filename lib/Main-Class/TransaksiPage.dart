@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart'; // Tambahkan ini untuk format tanggal
+import 'package:mobile/main.dart';
 import 'package:mobile/models/DataBarang.dart';
 import 'package:mobile/models/DataTransaksi.dart';
 import 'package:mobile/models/Keranjang.dart'; // Sesuaikan dengan path proyek Anda
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:provider/provider.dart'; // Import provider
+
+import 'package:mobile/models/login_response/user.dart';
 
 class TransaksiPage extends StatefulWidget {
   final List<Barang> keranjang;
@@ -10,6 +17,7 @@ class TransaksiPage extends StatefulWidget {
   final int qty;
   final int jumlahBarang;
   final Map<Barang, int> barangQtyMap;
+  final User currentUser; // Assuming User is the type of your currentUser
 
   const TransaksiPage({
     Key? key,
@@ -18,6 +26,7 @@ class TransaksiPage extends StatefulWidget {
     required this.qty,
     required this.jumlahBarang,
     required this.barangQtyMap, // Tambahkan barangQtyMap di sini
+    required this.currentUser,
   }) : super(key: key);
 
   @override
@@ -28,8 +37,18 @@ class _TransaksiPageState extends State<TransaksiPage> {
   final _formKey = GlobalKey<FormState>();
   final _namaCustomerController = TextEditingController();
   final _bayarController = TextEditingController();
-  int jumlahBarangDalamKeranjang(Barang barang) {
-    return widget.keranjang.where((item) => item == barang).length;
+  User currentUser = User();
+
+  String generateTransactionId() {
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('yyyyMMddHHmmss').format(now);
+    return 'TRX$formattedDate';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    currentUser = widget.currentUser;
   }
 
   @override
@@ -41,9 +60,14 @@ class _TransaksiPageState extends State<TransaksiPage> {
 
   @override
   Widget build(BuildContext context) {
-    double totalHarga = widget.totalHarga;
-    int totalQty =
-        widget.keranjang.length; // Menghitung jumlah barang dalam keranjang
+    // Menghitung total harga berdasarkan jumlah barang
+    double totalHarga = 0;
+    widget.barangQtyMap.forEach((barang, qty) {
+      totalHarga += barang.hargaSetelahDiskonBarang * qty;
+    });
+
+    String transactionId = generateTransactionId();
+    String formattedDate = DateFormat('dd MMMM yyyy').format(DateTime.now());
 
     return Scaffold(
       appBar: AppBar(
@@ -54,6 +78,36 @@ class _TransaksiPageState extends State<TransaksiPage> {
           key: _formKey,
           child: Column(
             children: [
+              // Tanggal dan ID Transaksi
+              Container(
+                margin: EdgeInsets.fromLTRB(24, 24, 24, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Tanggal: $formattedDate',
+                      style: GoogleFonts.getFont(
+                        'Inria Sans',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                        height: 1.3,
+                        color: Color(0xFF8B8E99),
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'ID Transaksi: $transactionId',
+                      style: GoogleFonts.getFont(
+                        'Inria Sans',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                        height: 1.3,
+                        color: Color(0xFF8B8E99),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               // Form untuk Nama Customer
               Container(
                 margin: EdgeInsets.fromLTRB(24, 24, 24, 12),
@@ -130,7 +184,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                 ),
               ),
               // List Barang
-              for (var barang in widget.keranjang)
+              for (var barang in widget.keranjang.toSet())
                 Container(
                   margin: EdgeInsets.fromLTRB(24, 0, 24, 4),
                   child: Row(
@@ -147,18 +201,55 @@ class _TransaksiPageState extends State<TransaksiPage> {
                           color: Color(0xFF8B8E99),
                         ),
                       ),
-                      Text(
-                        '${widget.barangQtyMap[barang]} x', // Menggunakan barangQtyMap
-                        style: GoogleFonts.getFont(
-                          'Inria Sans',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 12,
-                          height: 1.3,
-                          color: Color(0xFF8B8E99),
-                        ),
+                      Row(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              // Kurangi jumlah barang
+                              setState(() {
+                                if (widget.barangQtyMap[barang]! > 1) {
+                                  widget.barangQtyMap[barang] =
+                                      widget.barangQtyMap[barang]! - 1;
+                                }
+                              });
+                            },
+                            child: Icon(Icons.remove),
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            '${widget.barangQtyMap[barang]}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 12,
+                              color: Color(0xFF8B8E99),
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          InkWell(
+                            onTap: () {
+                              // Tambah jumlah barang jika masih ada stok tersedia
+                              setState(() {
+                                if (widget.barangQtyMap[barang]! <
+                                    barang.stokBarang) {
+                                  widget.barangQtyMap[barang] =
+                                      widget.barangQtyMap[barang]! + 1;
+                                } else {
+                                  // Jika stok habis, tampilkan notifikasi
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                          'Stok ${barang.namaBarang} habis'),
+                                    ),
+                                  );
+                                }
+                              });
+                            },
+                            child: Icon(Icons.add),
+                          ),
+                        ],
                       ),
                       Text(
-                        'Rp. ${barang.hargaSetelahDiskonBarang.toStringAsFixed(2)}',
+                        'Rp. ${(barang.hargaSetelahDiskonBarang * widget.barangQtyMap[barang]!).toStringAsFixed(2)}',
                         style: GoogleFonts.getFont(
                           'Inria Sans',
                           fontWeight: FontWeight.w700,
@@ -170,7 +261,8 @@ class _TransaksiPageState extends State<TransaksiPage> {
                     ],
                   ),
                 ),
-                Container(
+
+              Container(
                 margin: EdgeInsets.fromLTRB(25, 0, 27, 12.5),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -310,21 +402,57 @@ class _TransaksiPageState extends State<TransaksiPage> {
                   color: Color(0xFFFD006B),
                 ),
                 child: InkWell(
-                  onTap: () {
+                  onTap: () async {
                     if (_formKey.currentState!.validate()) {
                       Keranjang transaksi = Keranjang(
-                        id: 'TRX123', // Sesuaikan dengan ID transaksi yang diinginkan
+                        id: transactionId, // Menggunakan ID transaksi yang dihasilkan
                         idKaryawan:
                             'KRY123', // Sesuaikan dengan ID karyawan yang diinginkan
                         totalHarga: totalHarga,
-                        qty: totalQty,
+                        qty: widget.keranjang
+                            .length, // Menghitung jumlah barang dalam keranjang
                         bayar: double.parse(_bayarController.text),
                         kembalian:
-                            (double.parse(_bayarController.text) - totalHarga),
+                            double.parse(_bayarController.text) - totalHarga,
                       );
 
                       // Implementasi penyimpanan ke database di sini menggunakan nilai transaksi
                       print(transaksi.toMap());
+
+                      double kembalian =
+                          double.parse(_bayarController.text) - totalHarga;
+
+                      final response = await http.post(
+                        Uri.parse('http://127.0.0.1:8000/api/transaksi'),
+                        headers: <String, String>{
+                          'Content-Type': 'application/json; charset=UTF-8'
+                        },
+                        body: jsonEncode(<String, String>{
+                          'id_karyawan': currentUser.id
+                              .toString(), // Menggunakan id dari model User
+                          'total_harga': totalHarga.toString(),
+                          'bayar': _bayarController.text,
+                          'kembalian': kembalian.toString(),
+                        }),
+                      );
+                      if (response.statusCode == 200 ||
+                          response.statusCode == 201) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text('Berhasil melakukan transaksi')),
+                        );
+                        // Navigasi ke halaman LoginPage setelah berhasil melakukan transaksi
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginPage()),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text(
+                                  'Gagal melakukan transaksi error: ${response.statusCode}')),
+                        );
+                      }
                     }
                   },
                   child: Container(

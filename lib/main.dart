@@ -11,10 +11,15 @@ import 'package:mobile/models/login_response/login_response.dart';
 import 'package:mobile/models/login_response/user.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:mobile/view/DatabaseHelper.dart';
+import 'package:mobile/models/login_response/user.dart'; // Ensure this path is correct
+import 'package:mobile/view/Home.dart'; // Assuming this is where your HomePage or LoginPage is
+
+
 
 void main() {
   runApp(const MainApp());
 }
+
 
 class MainApp extends StatelessWidget {
   const MainApp({Key? key}) : super(key: key);
@@ -208,7 +213,7 @@ class _LoginPageState extends State<LoginPage> {
   try {
     // Kirim permintaan HTTP ke server untuk verifikasi login
     var response = await http.get(
-      Uri.parse('http://10.0.2.2:8000/api/login-mobile?email=$email&password=$password'),
+      Uri.parse('http://127.0.0.1:8000/api/login-mobile?email=$email&password=$password'),
     );
 
     // Periksa status kode respons

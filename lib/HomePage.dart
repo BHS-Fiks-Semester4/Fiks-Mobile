@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
       case 0:
         return Home();
       case 1:
-      return Transaction();
+      return Transaction(currentUser: widget.homePage);
         // return DataBarangWidget();
         // return isLoading
         //     ? CircularProgressIndicator()
@@ -109,7 +109,7 @@ class _HomePageState extends State<HomePage> {
 
 }
 Future<List<Barang>> getDataBarang() async {
-  final url = Uri.parse('http://10.0.2.2:8000/api/data_barang');
+  final url = Uri.parse('http://127.0.0.1:8000/api/data_barang');
 
   try {
     final response = await http.get(url);

@@ -3,19 +3,23 @@ import 'package:mobile/models/DataBarang.dart';
 import 'package:mobile/view/BarangTransaksi.dart';
 import 'package:mobile/Main-Class/Service.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile/models/login_response/user.dart';
 
 class Transaction extends StatefulWidget {
-  const Transaction({Key? key}) : super(key: key);
+  final User currentUser;
+  const Transaction({Key? key, required this.currentUser}) : super(key: key);
 
   @override
   State<Transaction> createState() => _TransactionState();
 }
 
 class _TransactionState extends State<Transaction> {
+  User currentUser = User();
   List<Barang> _listBarang = [];
 
   Future<void> fetchBarang() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:8000/api/data_barang'));
+    final response =
+        await http.get(Uri.parse('http://127.0.0.1:8000/api/data_barang'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -30,6 +34,7 @@ class _TransactionState extends State<Transaction> {
   void initState() {
     super.initState();
     fetchBarang();
+    currentUser = widget.currentUser;
   }
 
   @override
@@ -52,7 +57,10 @@ class _TransactionState extends State<Transaction> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => BarangTransaksi(listBarang: _listBarang)),
+                      MaterialPageRoute(
+                          builder: (context) => BarangTransaksi(
+                              listBarang: _listBarang,
+                              currentUser: widget.currentUser)),
                     );
                   },
                   style: ButtonStyle(
@@ -64,7 +72,8 @@ class _TransactionState extends State<Transaction> {
                             vertical: 15)), // Change button padding
                     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0), // Change border radius
+                        borderRadius:
+                            BorderRadius.circular(10.0), // Change border radius
                       ),
                     ),
                   ),
@@ -75,11 +84,13 @@ class _TransactionState extends State<Transaction> {
                     children: [
                       Icon(Icons.shopping_bag,
                           size: 80, color: Colors.pink), // Change icon color
-                      SizedBox(height: 10), // Add some spacing between icon and text
+                      SizedBox(
+                          height: 10), // Add some spacing between icon and text
                       Text('PENJUALAN',
                           style: TextStyle(
                               fontSize: 18,
-                              color: Colors.black)), // Change button label size and color
+                              color: Colors
+                                  .black)), // Change button label size and color
                     ],
                   ),
                 ),
@@ -100,7 +111,8 @@ class _TransactionState extends State<Transaction> {
                             vertical: 15)), // Change button padding
                     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0), // Change border radius
+                        borderRadius:
+                            BorderRadius.circular(10.0), // Change border radius
                       ),
                     ),
                   ),
@@ -111,11 +123,13 @@ class _TransactionState extends State<Transaction> {
                     children: [
                       Icon(Icons.build,
                           size: 80, color: Colors.pink), // Change icon color
-                      SizedBox(height: 10), // Add some spacing between icon and text
+                      SizedBox(
+                          height: 10), // Add some spacing between icon and text
                       Text('SERVICE',
                           style: TextStyle(
                               fontSize: 18,
-                              color: Colors.black)), // Change button label size and color
+                              color: Colors
+                                  .black)), // Change button label size and color
                     ],
                   ),
                 ),

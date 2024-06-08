@@ -3,11 +3,19 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile/models/DataBarang.dart';
 import 'package:mobile/Main-Class/TransaksiPage.dart';
 import 'package:mobile/models/DataTransaksi.dart';
+import 'package:mobile/models/login_response/user.dart';
 
 class BarangTransaksi extends StatefulWidget {
   final List<Barang> listBarang;
+  final User currentUser; // Assuming `User` is the class of your currentUser object
 
-  const BarangTransaksi({Key? key, required this.listBarang}) : super(key: key);
+
+   const BarangTransaksi({
+    Key? key,
+    required this.listBarang,
+    required this.currentUser,
+  }) : super(key: key);
+
 
   @override
   _BarangTransaksiState createState() => _BarangTransaksiState();
@@ -18,16 +26,30 @@ class _BarangTransaksiState extends State<BarangTransaksi> {
   double totalHarga = 0.0;
   int qty = 0;
   Map<Barang, int> keranjang = {};
+  User currentUser = User();
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    currentUser = widget.currentUser;
+  }
   void tambahBarang(Barang barang) {
     setState(() {
       if (keranjang.containsKey(barang)) {
-        keranjang[barang] = keranjang[barang]! + 1;
+        if (keranjang[barang]! < barang.stokBarang) {
+          keranjang[barang] = keranjang[barang]! + 1;
+          jumlahBarang++;
+          totalHarga += barang.hargaSetelahDiskonBarang;
+        } else {
+          // Jika jumlah yang ditambahkan melebihi stok, tampilkan pesan atau lakukan tindakan lain
+          print("Stok barang ${barang.namaBarang} sudah habis.");
+        }
       } else {
         keranjang[barang] = 1;
+        jumlahBarang++;
+        totalHarga += barang.hargaSetelahDiskonBarang;
       }
-      jumlahBarang++;
-      totalHarga += barang.hargaSetelahDiskonBarang;
     });
   }
 
@@ -49,22 +71,25 @@ class _BarangTransaksiState extends State<BarangTransaksi> {
   int jumlahBarangDalamKeranjang(Barang barang) {
     return keranjang.containsKey(barang) ? keranjang[barang]! : 0;
   }
-int getTotalQty(Map<Barang, int> keranjang) {
+
+  int getTotalQty(Map<Barang, int> keranjang) {
     int totalQty = 0;
     keranjang.forEach((barang, qty) {
       totalQty += qty;
     });
     return totalQty;
   }
+
   Map<Barang, int> getBarangQtyMap() {
-  Map<Barang, int> barangQtyMap = {};
-  keranjang.forEach((barang, qty) {
-    if (qty > 0) {
-      barangQtyMap[barang] = qty;
-    }
-  });
-  return barangQtyMap;
-}
+    Map<Barang, int> barangQtyMap = {};
+    keranjang.forEach((barang, qty) {
+      if (qty > 0) {
+        barangQtyMap[barang] = qty;
+      }
+    });
+    return barangQtyMap;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -136,38 +161,56 @@ int getTotalQty(Map<Barang, int> keranjang) {
                             ],
                           ),
                         ),
-                        SizedBox(width: 5),
-                        if (jumlahBarang > 0 &&
-                            jumlahBarangDalamKeranjang(barang) > 0)
-                          IconButton(
-                            icon: Icon(Icons.remove_circle_outline),
-                            color: Color(0xFF8B8E99),
-                            iconSize: 30, // Ukuran ikon negatif diperbesar
-                            onPressed: () {
-                              kurangiBarang(barang);
-                            },
-                          ),
-                        SizedBox(width: 5),
-                        IconButton(
-                          icon: Icon(
-                            Icons.add_circle_outline,
-                            color: jumlahBarangDalamKeranjang(barang) > 0
-                                ? Colors.red
-                                : Color(0xFF8B8E99),
-                          ),
-                          iconSize: 30, // Ukuran ikon tambah diperbesar
-                          onPressed: () {
-                            tambahBarang(barang);
-                          },
-                        ),
-                        SizedBox(width: 5),
-                        Text(
-                          jumlahBarangDalamKeranjang(barang).toString(),
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (jumlahBarang > 0 &&
+                                jumlahBarangDalamKeranjang(barang) > 0)
+                              IconButton(
+                                icon: Icon(Icons.remove_circle_outline),
+                                color: Color(0xFF8B8E99),
+                                iconSize: 30,
+                                onPressed: () {
+                                  kurangiBarang(barang);
+                                },
+                              ),
+                            SizedBox(width: 5),
+                            Text(
+                              jumlahBarangDalamKeranjang(barang).toString(),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            SizedBox(width: 5),
+                            IconButton(
+                              icon: Icon(
+                                Icons.add_circle_outline,
+                                color: jumlahBarangDalamKeranjang(barang) > 0
+                                    ? Colors.red
+                                    : Color(0xFF8B8E99),
+                              ),
+                              iconSize: 30,
+                              onPressed: () {
+                                // Periksa apakah jumlah barang dalam keranjang telah mencapai stok maksimum
+                                if (jumlahBarangDalamKeranjang(barang) <
+                                    barang.stokBarang) {
+                                  tambahBarang(barang);
+                             
+                                } else {
+                                  // Tampilkan pesan notifikasi jika stok barang sudah habis
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                          'Stok barang ${barang.namaBarang} sudah habis.'),
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -230,20 +273,19 @@ int getTotalQty(Map<Barang, int> keranjang) {
                               ),
                             ),
                           ),
-                          
                           GestureDetector(
                             onTap: () {
-                            Map<Barang, int> barangQtyMap = getBarangQtyMap();
+                              Map<Barang, int> barangQtyMap = getBarangQtyMap();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => TransaksiPage(
                                     keranjang: keranjang.keys.toList(),
-                                     barangQtyMap: barangQtyMap,
-                                    totalHarga:
-                                        totalHarga,
-                                        qty: getTotalQty(keranjang), 
-                                    jumlahBarang: jumlahBarang, // Berikan nilai jumlahBarang di sini
+                                    barangQtyMap: barangQtyMap,
+                                    totalHarga: totalHarga,
+                                    qty: getTotalQty(keranjang),
+                                    jumlahBarang: jumlahBarang,
+                                    currentUser: widget.currentUser,
                                   ),
                                 ),
                               );
