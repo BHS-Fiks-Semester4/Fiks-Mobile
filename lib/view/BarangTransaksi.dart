@@ -89,6 +89,17 @@ class _BarangTransaksiState extends State<BarangTransaksi> {
     });
     return barangQtyMap;
   }
+  Map<Barang, double> getSubTotal() {
+  Map<Barang, double> subTotalMap = {};
+  keranjang.forEach((barang, qty) {
+    if (qty > 0) {
+      // Assuming hargaSetelahDiskonBarang is a property of Barang that holds the price after discount
+      double subtotal = barang.hargaSetelahDiskonBarang .toDouble()* qty;
+      subTotalMap[barang] = subtotal;
+    }
+  });
+  return subTotalMap;
+}
 
   @override
   Widget build(BuildContext context) {
@@ -276,6 +287,8 @@ class _BarangTransaksiState extends State<BarangTransaksi> {
                           GestureDetector(
                             onTap: () {
                               Map<Barang, int> barangQtyMap = getBarangQtyMap();
+                                  var firstBarangId = keranjang.keys.toList().first.id; // Asumsi setiap barang memiliki field id
+
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -286,6 +299,9 @@ class _BarangTransaksiState extends State<BarangTransaksi> {
                                     qty: getTotalQty(keranjang),
                                     jumlahBarang: jumlahBarang,
                                     currentUser: widget.currentUser,
+                                    hargaSetelahDiskonBarang: getSubTotal() ,
+                                    id: firstBarangId, // Assuming currentUser has an id field
+
                                   ),
                                 ),
                               );

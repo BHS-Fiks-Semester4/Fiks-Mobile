@@ -24,6 +24,7 @@ class _TransactionState extends State<Transaction> {
     if (response.statusCode == 200) {
       setState(() {
         _listBarang = Barang.parseBarangs(response.body);
+        print(_listBarang.length);
       });
     } else {
       throw Exception('Failed to load barangs');

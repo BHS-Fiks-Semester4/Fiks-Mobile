@@ -14,6 +14,7 @@ import 'dart:convert';
 
 class HomePage extends StatefulWidget {
   final User homePage;
+  
 
   const HomePage({Key? key, required this.homePage}) : super(key: key);
 
@@ -46,7 +47,6 @@ class _HomePageState extends State<HomePage> {
         },
         items: <Widget>[
           Icon(Icons.home, size: 30, color: Colors.white),
-        
           Icon(Icons.add_circle, size: 30, color: Colors.white),
           Icon(Icons.insert_chart, size: 30, color: Colors.white),
           Icon(Icons.person, size: 30, color: Colors.white),
@@ -60,18 +60,16 @@ class _HomePageState extends State<HomePage> {
       case 0:
         return Home();
       case 1:
-      return Transaction(currentUser: widget.homePage);
-        // return DataBarangWidget();
-        // return isLoading
-        //     ? CircularProgressIndicator()
-        //     : DataBarangWidget(listBarang: listBarang);
+        return Transaction(currentUser: widget.homePage,);
+      // return DataBarangWidget();
+      // return isLoading
+      //     ? CircularProgressIndicator()
+      //     : DataBarangWidget(listBarang: listBarang);
       case 2:
         return Report();
       case 3:
-         return Profile(user: widget.homePage);
+        return Profile(user: widget.homePage);
 
-    
-       
       default:
         return Home();
     }
@@ -85,29 +83,29 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _fetchDataBarang() async {
-  setState(() {
-    isLoading = true;
-  });
+    setState(() {
+      isLoading = true;
+    });
 
-  try {
-    List<Barang> data = await getDataBarang();
-    setState(() {
-      listBarang = data;
-      isLoading = false;
-    });
-    print('Data barang berhasil dimuat: $listBarang');
-  } catch (e) {
-    setState(() {
-      isLoading = false;
-    });
-    // Tampilkan pesan kesalahan
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Gagal memuat data barang: $e')),
-    );
+    try {
+      List<Barang> data = await getDataBarang();
+      setState(() {
+        listBarang = data;
+        isLoading = false;
+      });
+      print('Data barang berhasil dimuat: $listBarang');
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      // Tampilkan pesan kesalahan
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal memuat data barang: $e')),
+      );
+    }
   }
 }
 
-}
 Future<List<Barang>> getDataBarang() async {
   final url = Uri.parse('http://127.0.0.1:8000/api/data_barang');
 
@@ -120,7 +118,8 @@ Future<List<Barang>> getDataBarang() async {
         try {
           final barang = Barang.fromJson(json);
           barangs.add(barang);
-          print('Barang: $barang');
+          print(
+              'Barang: ${barang.id}, ${barang.namaBarang},${barang.hargaBeliBarang}, ${barang.stokBarang}, ${barang.fotoBarang}, ${barang.deskripsiBarang}, ${barang.hargaSetelahDiskonBarang}, ${barang.garansiBarang}, ${barang.hargaSebelumDiskonBarang}, ${barang.idSupplier}, ${barang.createdAt}, ${barang.updatedAt}');
         } catch (e) {
           print('Error parsing barang: $e');
         }
@@ -133,5 +132,3 @@ Future<List<Barang>> getDataBarang() async {
     throw Exception('Gagal terhubung ke server: $e');
   }
 }
-
-

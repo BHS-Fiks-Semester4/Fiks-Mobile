@@ -17,7 +17,10 @@ class TransaksiPage extends StatefulWidget {
   final int qty;
   final int jumlahBarang;
   final Map<Barang, int> barangQtyMap;
+  final Map<Barang, double> hargaSetelahDiskonBarang;
   final User currentUser; // Assuming User is the type of your currentUser
+  final int id;
+
 
   const TransaksiPage({
     Key? key,
@@ -27,6 +30,8 @@ class TransaksiPage extends StatefulWidget {
     required this.jumlahBarang,
     required this.barangQtyMap, // Tambahkan barangQtyMap di sini
     required this.currentUser,
+    required this.hargaSetelahDiskonBarang,
+    required this.id,
   }) : super(key: key);
 
   @override
@@ -38,6 +43,8 @@ class _TransaksiPageState extends State<TransaksiPage> {
   final _namaCustomerController = TextEditingController();
   final _bayarController = TextEditingController();
   User currentUser = User();
+
+
 
   String generateTransactionId() {
     DateTime now = DateTime.now();
@@ -65,6 +72,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
     widget.barangQtyMap.forEach((barang, qty) {
       totalHarga += barang.hargaSetelahDiskonBarang * qty;
     });
+    
 
     String transactionId = generateTransactionId();
     String formattedDate = DateFormat('dd MMMM yyyy').format(DateTime.now());
@@ -418,21 +426,33 @@ class _TransaksiPageState extends State<TransaksiPage> {
 
                       // Implementasi penyimpanan ke database di sini menggunakan nilai transaksi
                       print(transaksi.toMap());
-
+                      
                       double kembalian =
-                          double.parse(_bayarController.text) - totalHarga;
+                      double.parse(_bayarController.text) - totalHarga;
+
+                      List<Map<String, dynamic>> detailTransaksi = widget.keranjang.map((barang) {
+      return {
+        'id_barang': barang.id,
+        'qty': widget.barangQtyMap[barang]!,
+        'sub_total': widget.hargaSetelahDiskonBarang[barang]!,
+      };
+    }).toList();
 
                       final response = await http.post(
                         Uri.parse('http://127.0.0.1:8000/api/transaksi'),
                         headers: <String, String>{
-                          'Content-Type': 'application/json; charset=UTF-8'
+                          'Content-Type': 'application/json; charset=UTF-8',
                         },
-                        body: jsonEncode(<String, String>{
+                        body: jsonEncode({
                           'id_karyawan': currentUser.id
-                              .toString(), // Menggunakan id dari model User
-                          'total_harga': totalHarga.toString(),
-                          'bayar': _bayarController.text,
-                          'kembalian': kembalian.toString(),
+                              .toString(), // Assuming currentUser.id is correctly defined
+                          'total_harga': totalHarga
+                              .toString(), // Assuming totalHarga is correctly defined
+                          'bayar': _bayarController
+                              .text, // Assuming _bayarController is correctly defined
+                          'kembalian': kembalian
+                              .toString(), // Assuming kembalian is correctly defined
+                          'detail_transaksi': detailTransaksi, // Correctly passing the list of maps without type annotation
                         }),
                       );
                       if (response.statusCode == 200 ||
