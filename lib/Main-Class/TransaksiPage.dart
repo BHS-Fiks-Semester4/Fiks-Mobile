@@ -6,6 +6,7 @@ import 'package:mobile/models/DataBarang.dart';
 import 'package:mobile/models/DataTransaksi.dart';
 import 'package:mobile/models/Keranjang.dart'; // Sesuaikan dengan path proyek Anda
 import 'package:http/http.dart' as http;
+import 'package:mobile/view/Home.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart'; // Import provider
 
@@ -20,7 +21,6 @@ class TransaksiPage extends StatefulWidget {
   final Map<Barang, double> hargaSetelahDiskonBarang;
   final User currentUser; // Assuming User is the type of your currentUser
   final int id;
-
 
   const TransaksiPage({
     Key? key,
@@ -43,8 +43,6 @@ class _TransaksiPageState extends State<TransaksiPage> {
   final _namaCustomerController = TextEditingController();
   final _bayarController = TextEditingController();
   User currentUser = User();
-
-
 
   String generateTransactionId() {
     DateTime now = DateTime.now();
@@ -72,7 +70,6 @@ class _TransaksiPageState extends State<TransaksiPage> {
     widget.barangQtyMap.forEach((barang, qty) {
       totalHarga += barang.hargaSetelahDiskonBarang * qty;
     });
-    
 
     String transactionId = generateTransactionId();
     String formattedDate = DateFormat('dd MMMM yyyy').format(DateTime.now());
@@ -426,17 +423,18 @@ class _TransaksiPageState extends State<TransaksiPage> {
 
                       // Implementasi penyimpanan ke database di sini menggunakan nilai transaksi
                       print(transaksi.toMap());
-                      
-                      double kembalian =
-                      double.parse(_bayarController.text) - totalHarga;
 
-                      List<Map<String, dynamic>> detailTransaksi = widget.keranjang.map((barang) {
-      return {
-        'id_barang': barang.id,
-        'qty': widget.barangQtyMap[barang]!,
-        'sub_total': widget.hargaSetelahDiskonBarang[barang]!,
-      };
-    }).toList();
+                      double kembalian =
+                          double.parse(_bayarController.text) - totalHarga;
+
+                      List<Map<String, dynamic>> detailTransaksi =
+                          widget.keranjang.map((barang) {
+                        return {
+                          'id_barang': barang.id,
+                          'qty': widget.barangQtyMap[barang]!,
+                          'sub_total': widget.hargaSetelahDiskonBarang[barang]!,
+                        };
+                      }).toList();
 
                       final response = await http.post(
                         Uri.parse('http://127.0.0.1:8000/api/transaksi'),
@@ -452,7 +450,8 @@ class _TransaksiPageState extends State<TransaksiPage> {
                               .text, // Assuming _bayarController is correctly defined
                           'kembalian': kembalian
                               .toString(), // Assuming kembalian is correctly defined
-                          'detail_transaksi': detailTransaksi, // Correctly passing the list of maps without type annotation
+                          'detail_transaksi':
+                              detailTransaksi, // Correctly passing the list of maps without type annotation
                         }),
                       );
                       if (response.statusCode == 200 ||
@@ -464,7 +463,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                         // Navigasi ke halaman LoginPage setelah berhasil melakukan transaksi
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => LoginPage()),
+                          MaterialPageRoute(builder: (context) => Home()),
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
