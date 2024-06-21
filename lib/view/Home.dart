@@ -5,7 +5,7 @@ import 'dart:convert'; // Import package json convert
 import 'package:mobile/view/kategori.dart';
 import 'package:mobile/models/pengeluaran.dart';
 import 'package:mobile/models/transaksi.dart';
-
+import 'package:mobile/models/detailTransaksi.dart';
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key); // Koreksi sintaks penulisan key
 
@@ -33,6 +33,7 @@ class _HomeState extends State<Home> {
   Map<String, dynamic> fetchedData = {};
   List<Transaksi> transaksiList = [];
   List<Pengeluaran> pengeluaranList = [];
+  List<DetailTransaksi> detailTransaksiList = [];
 
   Future<void> fetchTransactionsForMonth(String month) async {
     String baseUrl = 'http://127.0.0.1:8000/api/transaksi/';

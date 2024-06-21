@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart'; // Tambahkan ini untuk format tanggal
+import 'package:mobile/HomePage.dart';
 import 'package:mobile/main.dart';
 import 'package:mobile/models/DataBarang.dart';
 import 'package:mobile/models/DataTransaksi.dart';
 import 'package:mobile/models/Keranjang.dart'; // Sesuaikan dengan path proyek Anda
 import 'package:http/http.dart' as http;
 import 'package:mobile/view/Home.dart';
+import 'package:mobile/view/Transaction.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart'; // Import provider
-
+import 'package:mobile/view/Transaction.dart';
 import 'package:mobile/models/login_response/user.dart';
 
 class TransaksiPage extends StatefulWidget {
@@ -427,52 +429,67 @@ class _TransaksiPageState extends State<TransaksiPage> {
                       double kembalian =
                           double.parse(_bayarController.text) - totalHarga;
 
-                      List<Map<String, dynamic>> detailTransaksi =
-                          widget.keranjang.map((barang) {
-                        return {
-                          'id_barang': barang.id,
-                          'qty': widget.barangQtyMap[barang]!,
-                          'sub_total': widget.hargaSetelahDiskonBarang[barang]!,
-                        };
-                      }).toList();
+                      for (var barang in widget.keranjang) {
+                        double kembalian =
+                            double.parse(_bayarController.text) - totalHarga;
 
-                      final response = await http.post(
-                        Uri.parse('http://127.0.0.1:8000/api/transaksi'),
-                        headers: <String, String>{
-                          'Content-Type': 'application/json; charset=UTF-8',
-                        },
-                        body: jsonEncode({
-                          'id_karyawan': currentUser.id
-                              .toString(), // Assuming currentUser.id is correctly defined
-                          'total_harga': totalHarga
-                              .toString(), // Assuming totalHarga is correctly defined
-                          'bayar': _bayarController
-                              .text, // Assuming _bayarController is correctly defined
-                          'kembalian': kembalian
-                              .toString(), // Assuming kembalian is correctly defined
-                          'detail_transaksi':
-                              detailTransaksi, // Correctly passing the list of maps without type annotation
-                        }),
-                      );
-                      if (response.statusCode == 200 ||
-                          response.statusCode == 201) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text('Berhasil melakukan transaksi')),
-                        );
-                        // Navigasi ke halaman LoginPage setelah berhasil melakukan transaksi
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Home()),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text(
-                                  'Gagal melakukan transaksi error: ${response.statusCode}')),
-                        );
+                        try {
+                          final response = await http.post(
+                            Uri.parse('http://127.0.0.1:8000/api/transaksi'),
+                            headers: <String, String>{
+                              'Content-Type': 'application/json; charset=UTF-8',
+                            },
+                            body: jsonEncode(<String, dynamic>{
+                              // Struktur data Anda di sini
+                              'id_karyawan': currentUser.id
+                                  .toString(), // Assuming currentUser.id is correctly defined
+                              'total_harga': totalHarga
+                                  .toString(), // Assuming totalHarga is correctly defined
+                              'bayar': _bayarController
+                                  .text, // Assuming _bayarController is correctly defined
+                              'kembalian': kembalian
+                                  .toString(), // Assuming kembalian is correctly defined
+                              //masukkan id_barang saja ke dalam list
+                              'id_barang': barang
+                                  .id, // Kirim id_barang sebagai single item
+                              'qty': widget.barangQtyMap[
+                                  barang], // Kirim qty sebagai single
+                              'sub_total': widget.hargaSetelahDiskonBarang[
+                                  barang], // Kirim sub_total sebagai single item
+                            }),
+                          );
+
+                          if (response.statusCode == 200 ||
+                              response.statusCode == 201) {
+                            // Sukses
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HomePage(homePage: currentUser) // Assuming currentUser is the variable holding the current user's data
+                              ),
+                            );
+                          } else {
+                            // Gagal
+                            final responseBody = jsonDecode(response.body);
+                            print(
+                                'Gagal melakukan transaksi: ${responseBody['message']}');
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'Gagal melakukan transaksi: ${responseBody['message']}')),
+                            );
+                          }
+                        } catch (e) {
+                          print('Exception caught: $e');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(
+                                    'Terjadi kesalahan saat melakukan transaksi')),
+                          );
+                        }
                       }
                     }
+                    ;
                   },
                   child: Container(
                     padding: EdgeInsets.fromLTRB(0, 3.5, 0, 2.5),
