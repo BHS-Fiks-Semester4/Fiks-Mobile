@@ -69,4 +69,35 @@ class User {
   String toString() {
     return 'UserData{id: $id, name: $name, email: $email, username: $username, alamat: $alamat, noHp: $noHp, agama: $agama, tanggalLahir: $tanggalLahir, role: $role, status: $status, foto: $foto, createdAt: $createdAt, updatedAt: $updatedAt}';
   }
+   User copyWith({
+    int? id,
+    String? name,
+    String? email,
+    String? username,
+    String? alamat,
+    String? noHp,
+    String? agama,
+    String? tanggalLahir,
+    String? role,
+    String? status,
+    String? foto,
+    dynamic createdAt,
+    dynamic updatedAt,
+  }) {
+    return User(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      username: username ?? this.username,
+      alamat: alamat ?? this.alamat,
+      noHp: noHp ?? this.noHp,
+      agama: agama ?? this.agama,
+      tanggalLahir: tanggalLahir ?? this.tanggalLahir,
+      role: role ?? this.role,
+      status: status ?? this.status,
+      foto: foto ?? this.foto,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 }

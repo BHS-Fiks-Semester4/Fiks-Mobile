@@ -11,10 +11,10 @@ import 'package:mobile/main.dart';
 import 'package:mobile/models/DataBarang.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:mobile/Main-Class/Struk.dart';
 
 class HomePage extends StatefulWidget {
   final User homePage;
-  
 
   const HomePage({Key? key, required this.homePage}) : super(key: key);
 
@@ -48,7 +48,6 @@ class _HomePageState extends State<HomePage> {
         items: <Widget>[
           Icon(Icons.home, size: 30, color: Colors.white),
           Icon(Icons.add_circle, size: 30, color: Colors.white),
-          Icon(Icons.insert_chart, size: 30, color: Colors.white),
           Icon(Icons.person, size: 30, color: Colors.white),
         ],
       ),
@@ -60,14 +59,14 @@ class _HomePageState extends State<HomePage> {
       case 0:
         return Home();
       case 1:
-        return Transaction(currentUser: widget.homePage,);
+        return Transaction(
+          currentUser: widget.homePage,
+        );
       // return DataBarangWidget();
       // return isLoading
       //     ? CircularProgressIndicator()
       //     : DataBarangWidget(listBarang: listBarang);
       case 2:
-        return Report();
-      case 3:
         return Profile(user: widget.homePage);
 
       default:

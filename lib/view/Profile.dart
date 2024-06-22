@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/view/editprofile.dart';
 import 'package:mobile/models/login_response/user.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'package:mobile/view/DatabaseHelper.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
 
 class Profile extends StatefulWidget {
+  
   final User user;
 
   const Profile({Key? key, required this.user}) : super(key: key);
@@ -18,6 +26,20 @@ class _ProfileState extends State<Profile> {
   void initState() {
     super.initState();
     _currentUser = widget.user;
+    _loadUserData();
+    
+  }
+
+  Future<void> _loadUserData() async {
+    final loggedInUserId = await DatabaseHelper().getLoggedInUserId();
+    if (loggedInUserId != null) {
+      final user = await DatabaseHelper().getUser(loggedInUserId);
+      if (user != null) {
+        setState(() {
+          _currentUser = user;
+        });
+      }
+    }
   }
 
   @override
@@ -31,25 +53,32 @@ class _ProfileState extends State<Profile> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(20.0),
-                child: Row(
+                child: Stack(
                   children: [
-                    CircleAvatar(
-                      radius: 60,
-                      backgroundImage: AssetImage(
-                          'assets/poto.png'), // Ganti dengan path gambar Anda
+                    // CircleAvatar(
+                    //   radius: 60,
+                    //   backgroundImage: _currentUser.foto != null && _currentUser.foto!.isNotEmpty
+                    //       ? MemoryImage(base64Decode(_currentUser.foto!)!)
+                    //       : AssetImage('assets/logo.png'),
+                    // ),
+                    Image.memory(
+                      base64Decode(_currentUser.foto.toString()),
+                      width: 150,
+                      height: 150,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(Icons.image, size: 150);
+                      },
                     ),
-                    SizedBox(width: 20),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _currentUser.name ?? '',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: IconButton(
+                        icon: Icon(Icons.edit),
+                        onPressed: () {
+                          // Implement edit profile picture functionality
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -83,14 +112,17 @@ class _ProfileState extends State<Profile> {
                   }
                 },
                 style: ButtonStyle(
-                    minimumSize: MaterialStateProperty.all(Size(420, 50)),
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.pink),
-                    foregroundColor:
-                        MaterialStateProperty.all<Color>(Colors.white),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)))),
+                  minimumSize: MaterialStateProperty.all(Size(420, 50)),
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.pink),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.white),
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
                 child: Text('Edit Profile'),
               ),
               SizedBox(

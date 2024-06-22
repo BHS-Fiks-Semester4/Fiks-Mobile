@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile/main.dart';
 
 class ResetPassword extends StatefulWidget {
@@ -29,21 +29,21 @@ class _ResetPasswordState extends State<ResetPassword> {
         'password': _passwordController.text,
       }),
     );
-        print(response.statusCode);
+    print(response.statusCode);
 
     if (response.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Reset Password Success')),
       );
-      
-      // Navigasi ke halaman ResetPassword setelah berhasil mengirim OTP
+
+      // Navigasi ke halaman Login setelah berhasil mereset password
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => LoginPage()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to send OTP')),
+        SnackBar(content: Text('Failed to reset password')),
       );
     }
   }
@@ -55,57 +55,110 @@ class _ResetPasswordState extends State<ResetPassword> {
         title: Text('Reset Password'),
       ),
       body: Center(
-        child: Form(
-          key: _formKey,
+        child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: <Widget>[
-                TextFormField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    child: Image.asset(
+                      'assets/verifikasi.png',
+                      width: 200,
+                      height: 200,
+                    ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  controller: _otpController,
-                  decoration: const InputDecoration(
-                    labelText: 'OTP',
+                  Container(
+                    margin: EdgeInsets.fromLTRB(1, 0, 0, 70.5),
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Text(
+                        'Masukan 6 digit kode yang sudah di kirim ke email kamu',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.getFont(
+                          'Inria Sans',
+                          fontWeight: FontWeight.w400,
+                          fontSize: 15,
+                          height: 1.3,
+                          color: Color(0xFF000000),
+                        ),
+                      ),
+                    ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter the OTP';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  controller: _passwordController,
-                  decoration: const InputDecoration(
-                    labelText: 'New Password',
+                  SizedBox(
+                    width: 400,  // Adjust width as needed
+                    child: TextFormField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your email';
+                        }
+                        return null;
+                      },
+                    ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your new password';
-                    }
-                    return null;
-                  },
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      _resetPassword();
-                    }
-                  },
-                  child: const Text('Submit'),
-                ),
-              ],
+                  SizedBox(height: 10),
+                  SizedBox(
+                    width: 400,  // Adjust width as needed
+                    child: TextFormField(
+                      controller: _otpController,
+                      decoration: InputDecoration(
+                        labelText: 'OTP',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter the OTP';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    width: 400,  // Adjust width as needed
+                    child: TextFormField(
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                        labelText: 'New Password',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your new password';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        _resetPassword();
+                      }
+                    },
+                    style: ButtonStyle(
+                      minimumSize: MaterialStateProperty.all(Size(400, 50)),
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(Colors.pink),
+                      foregroundColor:
+                          MaterialStateProperty.all<Color>(Colors.white),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    child: const Text('Submit'),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

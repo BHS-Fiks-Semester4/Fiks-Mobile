@@ -14,12 +14,9 @@ import 'package:mobile/view/DatabaseHelper.dart';
 import 'package:mobile/models/login_response/user.dart'; // Ensure this path is correct
 import 'package:mobile/view/Home.dart'; // Assuming this is where your HomePage or LoginPage is
 
-
-
 void main() {
   runApp(const MainApp());
 }
-
 
 class MainApp extends StatelessWidget {
   const MainApp({Key? key}) : super(key: key);
@@ -37,7 +34,6 @@ class LoginPage extends StatefulWidget {
   final String? email;
 
   const LoginPage({Key? key, this.email}) : super(key: key);
-  
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -59,9 +55,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
+      appBar: AppBar(),
       body: Center(
         child: SizedBox(
           width: 400,
@@ -181,7 +175,6 @@ class _LoginPageState extends State<LoginPage> {
                           child: Text(
                             'Forgotten password?',
                             style: TextStyle(color: Colors.blue),
-
                           ),
                         ),
                         TextButton(
@@ -209,64 +202,65 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
- Future<void> _verifyLogin(String email, String password, BuildContext context) async {
-  try {
-    // Kirim permintaan HTTP ke server untuk verifikasi login
-    var response = await http.get(
-      Uri.parse('http://127.0.0.1:8000/api/login-mobile?email=$email&password=$password'),
-    );
+  Future<void> _verifyLogin(
+      String email, String password, BuildContext context) async {
+    try {
+      // Kirim permintaan HTTP ke server untuk verifikasi login
+      var response = await http.get(
+        Uri.parse(
+            'http://127.0.0.1:8000/api/login-mobile?email=$email&password=$password'),
+      );
 
-    // Periksa status kode respons
-    if (response.statusCode == 200) {
-      var responseData = jsonDecode(response.body);
-      LoginResponse loginResponse = LoginResponse.fromMap(responseData);
-      if (loginResponse.status == 'success') {
-        User? user = loginResponse.user;
-        if (user != null) {
-          user.id = responseData['id']; // Atur ID pengguna dari respons
-          
-          // Simpan data pengguna ke dalam database lokal
-          DatabaseHelper dbHelper = DatabaseHelper();
-          await dbHelper.insertUser(user);
+      // Periksa status kode respons
+      if (response.statusCode == 200) {
+        var responseData = jsonDecode(response.body);
+        LoginResponse loginResponse = LoginResponse.fromMap(responseData);
+        if (loginResponse.status == 'success') {
+          User? user = loginResponse.user;
+          if (user != null) {
+            user.id = responseData['id']; // Atur ID pengguna dari respons
 
-          print('User: $user');
+            // Simpan data pengguna ke dalam database lokal
+            DatabaseHelper dbHelper = DatabaseHelper();
+            await dbHelper.insertUser(user);
+
+            print('User: $user');
+            QuickAlert.show(
+              context: context,
+              type: QuickAlertType.success,
+              text: 'Login Successful!',
+            );
+            Future.delayed(Duration(seconds: 1), () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => HomePage(homePage: user!)),
+              );
+            });
+          }
+        } else {
           QuickAlert.show(
             context: context,
-            type: QuickAlertType.success,
-            text: 'Login Successful!',
+            type: QuickAlertType.error,
+            text: loginResponse.message ?? 'Login failed',
           );
-          Future.delayed(Duration(seconds: 1), () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => HomePage(homePage: user!)),
-            );
-          });
         }
       } else {
+        // Tangani kesalahan HTTP
         QuickAlert.show(
           context: context,
-          type: QuickAlertType.error,
-          text: loginResponse.message ?? 'Login failed',
+          type: QuickAlertType.warning,
+          text: 'Email or Password is incorrect',
         );
       }
-    } else {
-      // Tangani kesalahan HTTP
+    } catch (e) {
+      // Tangani kesalahan lainnya
+      print('Error: $e');
       QuickAlert.show(
         context: context,
-        type: QuickAlertType.warning,
-        text: 'Email or Password is incorrect',
+        type: QuickAlertType.error,
+        text: 'An error occurred while logging in',
       );
     }
-  } catch (e) {
-    // Tangani kesalahan lainnya
-    print('Error: $e');
-    QuickAlert.show(
-      context: context,
-      type: QuickAlertType.error,
-      text: 'An error occurred while logging in',
-    );
   }
-}
-
-
 }

@@ -3,28 +3,76 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:mobile/models/DataTransaksi.dart';
 import 'package:mobile/models/login_response/user.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite_common/sqlite_api.dart';
+
 
 class DatabaseHelper {
-  late Database _database;
+  static final DatabaseHelper _instance = DatabaseHelper._internal();
+  factory DatabaseHelper() => _instance;
+
+  DatabaseHelper._internal();
+
+  static Database? _database;
 
   Future<Database> get database async {
-    await _initDatabase(); // Memastikan inisialisasi database sebelum digunakan
-    return _database;
+    if (_database != null) return _database!;
+    _database = await _initDatabase();
+    return _database!;
   }
 
-  Future<void> _initDatabase() async {
-    _database = await openDatabase(
+  Future<Database> _initDatabase() async {
+    sqfliteFfiInit(); // Inisialisasi sqflite ffi
+    databaseFactory = databaseFactoryFfi; // Mengatur factory database
+    return await openDatabase(
       join(await getDatabasesPath(), 'akhwat_computer2.db'),
-      onCreate: (db, version) {
-        // Membuat tabel user jika belum ada
-        db.execute(
-          "CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, name TEXT, email TEXT, alamat TEXT, username TEXT, no_hp TEXT, agama TEXT, tanggal_lahir TEXT)",
+      onCreate: (db, version) async {
+        await db.execute(
+          "CREATE TABLE IF NOT EXISTS users("
+          "id INTEGER PRIMARY KEY, "
+          "name TEXT, "
+          "email TEXT, "
+          "alamat TEXT, "
+          "username TEXT, "
+          "no_hp TEXT, "
+          "agama TEXT, "
+          "tanggal_lahir TEXT, "
+          "foto BLOB, " // Change to BLOB for storing image data
+          "isLoggedIn INTEGER DEFAULT 0"
+          ")",
         );
 
-        // Membuat tabel transaksi jika belum ada
+        await db.execute(
+          "CREATE TABLE IF NOT EXISTS transaksi("
+          "id INTEGER PRIMARY KEY, "
+          "user_id INTEGER, "
+          "total INTEGER, "
+          "date TEXT"
+          ")",
+        );
+
+        // Add other table creation if needed
       },
       version: 1,
     );
+  }
+
+  Future<User?> getUser(int id) async {
+    try {
+      final db = await database;
+      final List<Map<String, dynamic>> maps = await db.query(
+        'users',
+        where: 'id = ?',
+        whereArgs: [id],
+        limit: 1,
+      );
+      if (maps.isNotEmpty) {
+        return User.fromMap(maps.first);
+      }
+    } catch (e) {
+      print('Terjadi kesalahan saat mengambil data user dari database: $e');
+    }
+    return null;
   }
 
   Future<int?> getLoggedInUserId() async {
@@ -32,18 +80,17 @@ class DatabaseHelper {
       final db = await database;
       final List<Map<String, dynamic>> maps = await db.query(
         'users',
-        where: 'isLoggedIn = ?', // Asumsi ada kolom isLoggedIn
-        whereArgs: [1], // Asumsi 1 untuk true
-        limit: 1, // Karena hanya memerlukan satu user yang login
+        where: 'isLoggedIn = ?',
+        whereArgs: [1],
+        limit: 1,
       );
       if (maps.isNotEmpty) {
-        // Asumsi kolom ID adalah 'id'
         return maps.first['id'] as int;
       }
     } catch (e) {
       print('Terjadi kesalahan saat mengambil ID user yang login: $e');
     }
-    return null; // Kembalikan null jika tidak ada user yang login atau terjadi kesalahan
+    return null;
   }
 
   Future<void> insertUser(User user) async {

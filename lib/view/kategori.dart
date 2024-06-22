@@ -48,7 +48,6 @@ class DetailKategori extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                
                                 SizedBox(width: 16),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,

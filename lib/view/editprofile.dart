@@ -6,6 +6,8 @@ import 'package:sqflite_common/sqlite_api.dart';
 import 'dart:convert';
 import 'DatabaseHelper.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'dart:typed_data';
+import 'package:image_picker/image_picker.dart';
 
 class EditProfile extends StatefulWidget {
   final User currentUser;
@@ -24,6 +26,8 @@ class EditProfileState extends State<EditProfile> {
   late TextEditingController _tanggalLahirController;
   late TextEditingController _noHpController;
   late TextEditingController _nameController;
+  Uint8List? _imageBytes;
+  String? _base64Image;
 
   final _databaseHelper = DatabaseHelper();
 
@@ -39,6 +43,9 @@ class EditProfileState extends State<EditProfile> {
     _tanggalLahirController =
         TextEditingController(text: widget.currentUser.tanggalLahir);
     _noHpController = TextEditingController(text: widget.currentUser.noHp);
+    _base64Image = widget.currentUser.foto;
+    _imageBytes = _base64Image != null ? base64Decode(_base64Image!) : null;
+    
   }
 
   @override
@@ -53,11 +60,43 @@ class EditProfileState extends State<EditProfile> {
     super.dispose();
   }
 
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      final bytes = await pickedFile.readAsBytes();
+      setState(() {
+        _imageBytes = bytes;
+        _base64Image = base64Encode(bytes);
+      });
+    }
+  }
+
+  Future<void> _uploadImage(int userId, String base64Image) async {
+    try {
+      final response = await http.post(
+        Uri.parse(
+            'http://127.0.0.1:8000/api/users/$userId/upload-profile-image'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'foto': base64Image}),
+      );
+
+      if (response.statusCode == 200) {
+        print('Profile image uploaded successfully');
+      } else {
+        print(
+            'Failed to upload profile image. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error uploading profile image: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Profil'),
+        title: Text('Edit Profile'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -65,152 +104,124 @@ class EditProfileState extends State<EditProfile> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Positioned(
-              //   top: 82,
-              //   child: Container(
-              //     decoration: BoxDecoration(
-              //       color: Color(0xFFD9D9D9),
-              //       borderRadius: BorderRadius.circular(39),
-              //     ),
-              //     child: Container(
-              //       width: 78,
-              //       height: 78,
-              //       padding: EdgeInsets.fromLTRB(16.3, 12.7, 15.7, 19.3),
-              //       child: SizedBox(
-              //         width: 46,
-              //         height: 46,
-              //         child: SvgPicture.network(
-              //           'assets/vectors/vector_56_x2.svg',
-              //         ),
-              //       ),
-              //     ),
-              //   ),
-              // ),
-              // SizedBox(height: 20),
+              Center(
+                child: GestureDetector(
+                  onTap: _pickImage,
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundImage: _imageBytes != null
+                        ? MemoryImage(_imageBytes!)
+                        : AssetImage('assets/logo.png')
+                            as ImageProvider,
+                    child: _imageBytes == null
+                        ? Icon(Icons.add_a_photo, size: 50, color: Colors.grey)
+                        : null,
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
               TextFormField(
                 controller: _nameController,
                 style: TextStyle(fontSize: 16, color: Colors.black),
                 decoration: InputDecoration(
-                    labelText: 'Name',
-                    border: OutlineInputBorder(),
-                    labelStyle: TextStyle(color: Colors.black),
-                    prefixIcon: Icon(Icons.person),
-                    enabled: false),
+                  labelText: 'Nama',
+                  border: OutlineInputBorder(),
+                ),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 20),
               TextFormField(
                 controller: _usernameController,
+                style: TextStyle(fontSize: 16, color: Colors.black),
                 decoration: InputDecoration(
                   labelText: 'Username',
                   border: OutlineInputBorder(),
-                  labelStyle: TextStyle(color: Colors.black),
-                  prefixIcon: Icon(Icons.person),
                 ),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 20),
               TextFormField(
                 controller: _emailController,
+                style: TextStyle(fontSize: 16, color: Colors.black),
                 decoration: InputDecoration(
                   labelText: 'Email',
                   border: OutlineInputBorder(),
-                  labelStyle: TextStyle(color: Colors.black),
-                  prefixIcon: Icon(Icons.email),
                 ),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 20),
               TextFormField(
                 controller: _alamatController,
+                style: TextStyle(fontSize: 16, color: Colors.black),
                 decoration: InputDecoration(
                   labelText: 'Alamat',
                   border: OutlineInputBorder(),
-                  labelStyle: TextStyle(color: Colors.black),
-                  prefixIcon: Icon(Icons.maps_home_work),
                 ),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 20),
               TextFormField(
                 controller: _agamaController,
                 style: TextStyle(fontSize: 16, color: Colors.black),
                 decoration: InputDecoration(
-                    labelText: 'Agama',
-                    border: OutlineInputBorder(),
-                    labelStyle: TextStyle(color: Colors.black),
-                    prefixIcon: Icon(Icons.star),
-                    enabled: false),
+                  labelText: 'Agama',
+                  border: OutlineInputBorder(),
+                ),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 20),
               TextFormField(
                 controller: _tanggalLahirController,
                 style: TextStyle(fontSize: 16, color: Colors.black),
                 decoration: InputDecoration(
-                    labelText: 'Tanggal Lahir',
-                    border: OutlineInputBorder(),
-                    labelStyle: TextStyle(color: Colors.black),
-                    prefixIcon: Icon(Icons.calendar_month),
-                    enabled: false),
+                  labelText: 'Tanggal Lahir',
+                  border: OutlineInputBorder(),
+                ),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 20),
               TextFormField(
                 controller: _noHpController,
+                style: TextStyle(fontSize: 16, color: Colors.black),
                 decoration: InputDecoration(
                   labelText: 'No HP',
                   border: OutlineInputBorder(),
-                  labelStyle: TextStyle(color: Colors.black),
-                  prefixIcon: Icon(Icons.phone),
                 ),
               ),
-              SizedBox(height: 16),
-              ElevatedButton(
-                style: ButtonStyle(
-                    minimumSize: MaterialStateProperty.all(Size(420, 50)),
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.pink),
-                    foregroundColor:
-                        MaterialStateProperty.all<Color>(Colors.white),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)))),
-                onPressed: () async {
-                  // Menyiapkan data pengguna yang akan diperbarui
-                  final updatedUser = User(
-                    id: widget.currentUser.id,
-                    username: _usernameController.text,
-                    email: _emailController.text,
-                    alamat: _alamatController.text,
-                    agama: _agamaController.text,
-                    tanggalLahir: _tanggalLahirController.text,
-                    noHp: _noHpController.text,
-                    name: _nameController.text,
-                    
-                  );
+              SizedBox(height: 20),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    User updatedUser = widget.currentUser.copyWith(
+                      name: _nameController.text,
+                      username: _usernameController.text,
+                      email: _emailController.text,
+                      alamat: _alamatController.text,
+                      agama: _agamaController.text,
+                      tanggalLahir: _tanggalLahirController.text,
+                      noHp: _noHpController.text,
+                      foto: _base64Image,
+                    );
 
-                  // Memperbarui data pengguna di database lokal
-                  await _databaseHelper.updateProfile(updatedUser);
+                    await _databaseHelper.updateProfile(updatedUser);
 
-                  // Kirim permintaan pembaruan profil ke server
-                  final response = await http.put(
-                    Uri.parse(
-                        'http://127.0.0.1:8000/api/users/${updatedUser.id}'),
-                    headers: {'Content-Type': 'application/json'},
-                    body: jsonEncode(updatedUser.toMap()),
-                  );
+                    if (_base64Image != null) {
+                      await _uploadImage(updatedUser.id!, _base64Image!);
+                    }
 
-                  if (response.statusCode == 200) {
-                    // Berhasil memperbarui profil
-                    print('User profile updated successfully');
+                    // Add the API call to update user data here
+                    final response = await http.put(
+                      Uri.parse(
+                          'http://127.0.0.1:8000/api/users/${updatedUser.id}'),
+                      headers: {'Content-Type': 'application/json'},
+                      body: jsonEncode(updatedUser.toMap()),
+                    );
+
+                    if (response.statusCode == 200) {
+                      print('User data updated successfully on the server');
+                    } else {
+                      print(
+                          'Failed to update user data on the server. Status code: ${response.statusCode}');
+                    }
 
                     Navigator.pop(context, updatedUser);
-                  } else {
-                    // Gagal memperbarui profilx`
-                    print('Failed to update user profile');
-                    print('Response status code: ${response.statusCode}');
-                    print('Response body: ${response.body}');
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to update profile')),
-                    );
-                  }
-                },
-                child: Text('Simpan'),
+                  },
+                  child: Text('Simpan'),
+                ),
               ),
             ],
           ),
