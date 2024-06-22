@@ -244,10 +244,47 @@ class _HomeState extends State<Home> {
                 physics: NeverScrollableScrollPhysics(),
                 itemCount: transaksiList.length,
                 itemBuilder: (context, index) {
-                  return Card(
-                    color: Colors.white,
+                  return InkWell(
+                    onTap: () {
+                      // Tampilkan pop-up detail transaksi
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Detail Transaksi'),
+                            content: SingleChildScrollView(
+                              child: ListBody(
+                                children: transaksiList[index]
+                                    .detailTransaksi
+                                    .map<Widget>((detail) {
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text('ID Barang: ${detail.idBarang}'),
+                                      Text('Nama Barang: ${detail.namaBarang}'),
+                                      Text('Quantity: ${detail.qty}'),
+                                      Text('Sub Total: ${detail.subTotal}'),
+                                      SizedBox(height: 10),
+                                    ],
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
                     child: ListTile(
-                      title: Text("Transaksi"),
+                      title: Text('Transaksi'),
                       trailing: Text(
                         "+ ${transaksiList[index].totalHarga.toString()}",
                         style: TextStyle(
@@ -263,14 +300,50 @@ class _HomeState extends State<Home> {
                 physics: NeverScrollableScrollPhysics(),
                 itemCount: pengeluaranList.length,
                 itemBuilder: (context, index) {
-                  return Card(
-                    color: Colors.white,
-                    child: ListTile(
-                      title: Text("Pengeluaran"),
-                      trailing: Text(
-                        "- ${pengeluaranList[index].totalPengeluaran.toString()}",
-                        style: TextStyle(
-                          color: Colors.red,
+                  return InkWell(
+                    onTap: () {
+                      // Tampilkan pop-up detail pengeluaran
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Detail Pengeluaran'),
+                            content: SingleChildScrollView(
+                              child: ListBody(
+                                children: <Widget>[
+                                  Text(
+                                      'Nama Pengeluaran: ${pengeluaranList[index].namaPengeluaran}'),
+                                  Text(
+                                      'Total Pengeluaran: ${pengeluaranList[index].totalPengeluaran}'),
+                                  Text(
+                                      'Nama Barang: ${pengeluaranList[index].namaBarang}'),
+                                  Text(
+                                      'Status: ${pengeluaranList[index].status}'),
+                                  Text(
+                                      'Tanggal: ${pengeluaranList[index].createdAt}'),
+                                  
+                                  // Tambahkan lebih banyak detail sesuai kebutuhan
+                                ],
+                              ),
+                            ),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    child: Card(
+                      child: ListTile(
+                        title: Text(pengeluaranList[index].namaPengeluaran),
+                        trailing: Text(
+                          "- ${pengeluaranList[index].totalPengeluaran.toString()}",
+                          style: TextStyle(
+                            color: Colors.red,
+                          ),
                         ),
                       ),
                     ),
@@ -350,6 +423,26 @@ class _HomeState extends State<Home> {
   }
 
 // Class untuk Halaman Detail Kategori
+
+  void _showDialogDetail(BuildContext context, String title, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void main() {
     runApp(MaterialApp(
