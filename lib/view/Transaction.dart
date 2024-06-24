@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/models/DataBarang.dart';
 import 'package:mobile/view/BarangTransaksi.dart';
-import 'package:mobile/Main-Class/Service.dart';
+import 'package:mobile/Main-Class/service/service_index.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/models/login_response/user.dart';
 
@@ -100,7 +100,7 @@ class _TransactionState extends State<Transaction> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Service()),
+                      MaterialPageRoute(builder: (context) => ServiceIndexPage()),
                     );
                   },
                   style: ButtonStyle(
