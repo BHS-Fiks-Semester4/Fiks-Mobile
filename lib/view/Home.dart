@@ -4,22 +4,34 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:mobile/view/kategori.dart';
 import 'package:mobile/models/pengeluaran.dart';
+import 'package:intl/intl.dart';
+import 'package:mobile/models/Penghasilan.dart';
 import 'package:mobile/models/transaksi.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'package:mobile/view/DatabaseHelper.dart';
+import 'package:mobile/models/login_response/user.dart';
 
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+  final User user;
+  const Home({Key? key, required this.user}) : super(key: key);
 
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
+  User? user;
   List<dynamic> kategoriBarang = [];
   List<Transaksi> transaksiList = [];
   List<Pengeluaran> pengeluaranList = [];
+  PenghasilanBersih? penghasilanBersih;
+  User _currentUser = User();
   String selectedButton = '';
   String selectedMonth =
       DateTime.now().month.toString(); // Track selected month
+  final TextEditingController _searchController = TextEditingController();
+
   Future<void> fetchKategoriBarang() async {
     final response =
         await http.get(Uri.parse('http://127.0.0.1:8000/api/kategori'));
@@ -36,10 +48,6 @@ class _HomeState extends State<Home> {
       throw Exception('Failed to load kategori');
     }
   }
-
-  Map<String, dynamic> fetchedData = {};
-  // List<Transaksi> transaksiList = [];
-  // List<Pengeluaran> pengeluaranList = [];
 
   Future<void> fetchTransactionsForMonth(String month) async {
     String baseUrl = 'http://127.0.0.1:8000/api/transaksi/';
@@ -69,9 +77,51 @@ class _HomeState extends State<Home> {
     }
   }
 
+  Future<PenghasilanBersih> fetchPenghasilanBersih(String month) async {
+    String baseUrl = 'http://127.0.0.1:8000/api/penghasilan-dan-pengeluaran/';
+    String fullUrl = baseUrl + month;
+    Uri url = Uri.parse(fullUrl);
+
+    try {
+      var response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return PenghasilanBersih.fromJson(data);
+      } else {
+        throw Exception('Failed to load data: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<void> loadPenghasilanBersih(String month) async {
+    try {
+      final penghasilan = await fetchPenghasilanBersih(month);
+      setState(() {
+        penghasilanBersih = penghasilan;
+      });
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
   void loadCurrentMonthTransactions() {
     String currentMonth = DateTime.now().month.toString();
     fetchTransactionsForMonth(currentMonth);
+    loadPenghasilanBersih(currentMonth);
+  }
+
+  Future<void> _loadUserData() async {
+    final loggedInUserId = await DatabaseHelper().getLoggedInUserId();
+    if (loggedInUserId != null) {
+      final user = await DatabaseHelper().getUser(loggedInUserId);
+      if (user != null) {
+        setState(() {
+          _currentUser = user;
+        });
+      }
+    }
   }
 
   @override
@@ -79,6 +129,9 @@ class _HomeState extends State<Home> {
     fetchKategoriBarang();
     loadCurrentMonthTransactions();
     super.initState();
+    _currentUser = widget.user;
+    _loadUserData();
+    // fetchUserData();
   }
 
   @override
@@ -111,26 +164,44 @@ class _HomeState extends State<Home> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
-                                  margin: EdgeInsets.fromLTRB(0, 0, 11, 0),
+                                  margin: EdgeInsets.fromLTRB(0, 0, 13, 0),
                                   child: Container(
                                     decoration: BoxDecoration(
                                       color: Color(0xFFFFFFFF),
-                                      borderRadius: BorderRadius.circular(23),
+                                      borderRadius: BorderRadius.circular(28.5),
                                     ),
                                     child: Container(
-                                      width: 46,
-                                      height: 46,
+                                      width: 56,
+                                      height: 56,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFFFFFFFF),
+                                        borderRadius: BorderRadius.circular(33),
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(33),
+                                        child: Image.memory(
+                                          base64Decode(
+                                              _currentUser.foto.toString()),
+                                          width: 40,
+                                          height: 40,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return Icon(Icons.image, size: 40);
+                                          },
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
                                 Container(
                                   margin: EdgeInsets.fromLTRB(0, 7, 0, 9),
                                   child: Text(
-                                    'WELCOME ...M HILFAN PERDANA',
+                                    'Welcome ${_currentUser.name}',
                                     style: GoogleFonts.getFont(
                                       'Inter',
                                       fontWeight: FontWeight.w400,
-                                      fontSize: 12,
+                                      fontSize: 22,
                                       color: Color(0xFFFFFFFF),
                                     ),
                                   ),
@@ -139,19 +210,218 @@ class _HomeState extends State<Home> {
                             ),
                           ),
                         ),
-                        Container(
-                          margin: EdgeInsets.fromLTRB(7, 0, 0, 0),
+                        Center(
+                            child: Center(
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Color(0xFFFFFFFF),
+                              color: Color.fromARGB(255, 255, 255, 255),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: Container(
-                              width: 330,
-                              height: 164,
+                            child: SizedBox(
+                              width: 400,
+                              height: 200,
+                              child: Container(
+                                padding: EdgeInsets.fromLTRB(18, 21, 24.8, 15),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      margin: EdgeInsets.fromLTRB(7, 0, 7, 2),
+                                      child: Align(
+                                        alignment: Alignment.topLeft,
+                                        child: Text(
+                                          'TOTAL PENGHASILAN',
+                                          style: GoogleFonts.getFont(
+                                            'Mitr',
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                            color: Color.fromARGB(255, 0, 0, 0),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.fromLTRB(7, 0, 7, 16),
+                                      child: Align(
+                                        alignment: Alignment.topLeft,
+                                        child: Text(
+                                          '${penghasilanBersih!.bulananPenghasilan}',
+                                          style: GoogleFonts.getFont(
+                                            'Inter',
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 14,
+                                            color: Color(0xFF000000),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.fromLTRB(0, 0, 0, 7),
+                                      child: Align(
+                                        alignment: Alignment.topLeft,
+                                        child: SizedBox(
+                                          width: 275.2,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                margin: EdgeInsets.fromLTRB(
+                                                    0, 2, 0, 0),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                      margin:
+                                                          EdgeInsets.fromLTRB(
+                                                              0, 0, 8, 0),
+                                                      child: Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          image:
+                                                              DecorationImage(
+                                                            fit: BoxFit.contain,
+                                                            image: NetworkImage(
+                                                              'assets/up.png',
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        child: Container(
+                                                          width: 31,
+                                                          height: 31,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      margin:
+                                                          EdgeInsets.fromLTRB(
+                                                              0, 6, 0, 9),
+                                                      child: Text(
+                                                        'Income',
+                                                        style:
+                                                            GoogleFonts.getFont(
+                                                          'Meera Inimai',
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          fontSize: 15,
+                                                          color: Color.fromARGB(
+                                                              255, 0, 0, 0),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Container(
+                                                margin: EdgeInsets.fromLTRB(
+                                                    0, 0, 0, 1),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                      margin:
+                                                          EdgeInsets.fromLTRB(
+                                                              0, 0, 9, 0),
+                                                      child: Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          image:
+                                                              DecorationImage(
+                                                            fit: BoxFit.contain,
+                                                            image: NetworkImage(
+                                                              'assets/down.png',
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        child: Container(
+                                                          width: 32,
+                                                          height: 32,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      margin:
+                                                          EdgeInsets.fromLTRB(
+                                                              0, 6, 0, 10),
+                                                      child: Text(
+                                                        'Expends',
+                                                        style:
+                                                            GoogleFonts.getFont(
+                                                          'Meera Inimai',
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          fontSize: 15,
+                                                          color: Color.fromARGB(
+                                                              255, 0, 0, 0),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.fromLTRB(7, 0, 0, 0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            margin: EdgeInsets.fromLTRB(
+                                                0, 0, 5.5, 2),
+                                            child: SizedBox(
+                                              width: 150,
+                                              child: Text(
+                                                '${penghasilanBersih!.harianPenghasilan}',
+                                                style: GoogleFonts.getFont(
+                                                  'Inter',
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 14,
+                                                  color: Color(0xFF000000),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                         Container(
+                                            margin: EdgeInsets.fromLTRB(
+                                                0, 0, 5.5, 2),
+                                            child: SizedBox(
+                                              width: 150,
+                                              child: Text(
+                                                '${penghasilanBersih!.harianPengeluaran}',
+                                                style: GoogleFonts.getFont(
+                                                  'Inter',
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 14,
+                                                  color: Color(0xFF000000),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                        ))
                       ],
                     ),
                   ),
@@ -188,55 +458,79 @@ class _HomeState extends State<Home> {
               ),
               SizedBox(height: 20),
               SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    for (var i = 1; i <= 12; i++)
-                      MouseRegion(
-                        onEnter: (_) {
-                          setState(() {
-                            selectedMonth =
-                                i.toString(); // Update selected month on hover
-                          });
-                        },
-                        onExit: (_) {
-                          setState(() {
-                            selectedMonth = DateTime.now()
-                                .month
-                                .toString(); // Reset selected month on exit hover
-                          });
-                        },
-                        child: ElevatedButton(
-                          onPressed: () {
-                            fetchTransactionsForMonth(
-                                i.toString()); // Fetch data for each month
-                          },
-                          child: Text(getMonthName(i)),
-                          style: ElevatedButton.styleFrom(
-                            elevation: 3,
-                            shadowColor: Colors.grey,
-                            shape: RoundedRectangleBorder(
+                scrollDirection: Axis.vertical,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            for (var i = 1; i <= 12; i++)
+                              MouseRegion(
+                                onEnter: (_) {
+                                  setState(() {
+                                    selectedMonth = i.toString();
+                                  });
+                                },
+                                onExit: (_) {
+                                  setState(() {
+                                    selectedMonth =
+                                        DateTime.now().month.toString();
+                                  });
+                                },
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      selectedButton = i.toString();
+                                    });
+                                    fetchTransactionsForMonth(i.toString());
+                                    loadPenghasilanBersih(i.toString());
+                                  },
+                                  child: Text(getMonthName(i)),
+                                  style: ElevatedButton.styleFrom(
+                                    elevation: 3,
+                                    shadowColor: Colors.grey,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    side: BorderSide(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      width: 1,
+                                    ),
+                                  ).copyWith(
+                                    backgroundColor: MaterialStateProperty.all(
+                                      selectedButton == i.toString()
+                                          ? const Color.fromRGBO(253, 0, 107, 1)
+                                          : Colors.white,
+                                    ),
+                                    foregroundColor: MaterialStateProperty.all(
+                                      selectedButton == i.toString()
+                                          ? Colors.white
+                                          : Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            labelText: 'Search on progress services',
+                            prefixIcon: const Icon(Icons.search),
+                            border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            side: BorderSide(
-                              color: Colors.grey.withOpacity(0.5),
-                              width: 1,
-                            ),
-                          ).copyWith(
-                            backgroundColor: MaterialStateProperty.all(
-                              selectedButton == i.toString()
-                                  ? const Color.fromRGBO(253, 0, 107, 1)
-                                  : Colors.white,
-                            ),
-                            foregroundColor: MaterialStateProperty.all(
-                              selectedButton == i.toString()
-                                  ? Colors.white
-                                  : Colors.black,
                             ),
                           ),
                         ),
                       ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               ListView.builder(
@@ -251,44 +545,113 @@ class _HomeState extends State<Home> {
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: Text('Detail Transaksi'),
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                            ),
+                            title: Text(
+                              'Detail Transaksi',
+                              style: TextStyle(
+                                color: Colors.blue,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             content: SingleChildScrollView(
                               child: ListBody(
                                 children: transaksiList[index]
                                     .detailTransaksi
                                     .map<Widget>((detail) {
-                                  return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text('ID Barang: ${detail.idBarang}'),
-                                      Text('Nama Barang: ${detail.namaBarang}'),
-                                      Text('Quantity: ${detail.qty}'),
-                                      Text('Sub Total: ${detail.subTotal}'),
-                                      SizedBox(height: 10),
-                                    ],
+                                  return Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      side: BorderSide(
+                                        color: Colors.grey,
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                    margin: EdgeInsets.symmetric(vertical: 5.0),
+                                    child: Padding(
+                                      padding: EdgeInsets.all(10.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Row(
+                                            children: [
+                                              Icon(Icons.label,
+                                                  color: Colors.blue),
+                                              SizedBox(width: 5),
+                                              Text(
+                                                'ID Barang: ${detail.idBarang}',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 5),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.shopping_bag,
+                                                  color: Colors.green),
+                                              SizedBox(width: 5),
+                                              Text(
+                                                  'Nama Barang: ${detail.namaBarang}'),
+                                            ],
+                                          ),
+                                          SizedBox(height: 5),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.format_list_numbered,
+                                                  color: Colors.orange),
+                                              SizedBox(width: 5),
+                                              Text('Quantity: ${detail.qty}'),
+                                            ],
+                                          ),
+                                          SizedBox(height: 5),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.attach_money,
+                                                  color: Colors.red),
+                                              SizedBox(width: 5),
+                                              Text(
+                                                  'Sub Total: ${detail.subTotal}'),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   );
                                 }).toList(),
                               ),
                             ),
-                            actions: [
+                            actions: <Widget>[
                               TextButton(
+                                child: Text(
+                                  'Close',
+                                  style: TextStyle(color: Colors.red),
+                                ),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },
-                                child: Text('OK'),
                               ),
                             ],
                           );
                         },
                       );
                     },
-                    child: ListTile(
-                      title: Text('Transaksi'),
-                      trailing: Text(
-                        "+ ${transaksiList[index].totalHarga.toString()}",
-                        style: TextStyle(
-                          color: Colors.green,
+                    child: Card(
+                      child: ListTile(
+                        title: Text('Transaksi'),
+                        subtitle: Text(
+                          '${DateFormat('dd MMM yyyy').format(DateTime.parse(transaksiList[index].createdAt))}',
+                        ),
+                        trailing: Text(
+                          "+ ${transaksiList[index].totalHarga.toString()}",
+                          style: TextStyle(
+                            color: Colors.green,
+                          ),
                         ),
                       ),
                     ),
@@ -307,29 +670,102 @@ class _HomeState extends State<Home> {
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: Text('Detail Pengeluaran'),
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15.0)),
+                            ),
+                            title: Text(
+                              'Detail Pengeluaran',
+                              style: TextStyle(
+                                color: Colors.blue,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             content: SingleChildScrollView(
                               child: ListBody(
                                 children: <Widget>[
-                                  Text(
-                                      'Nama Pengeluaran: ${pengeluaranList[index].namaPengeluaran}'),
-                                  Text(
-                                      'Total Pengeluaran: ${pengeluaranList[index].totalPengeluaran}'),
-                                  Text(
-                                      'Nama Barang: ${pengeluaranList[index].namaBarang}'),
-                                  Text(
-                                      'Status: ${pengeluaranList[index].status}'),
-                                  Text(
-                                      'Tanggal: ${pengeluaranList[index].createdAt}'),
-                                  
-                                  // Tambahkan lebih banyak detail sesuai kebutuhan
+                                  Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      side: BorderSide(
+                                        color: Colors.grey,
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                    margin: EdgeInsets.symmetric(vertical: 5.0),
+                                    child: Padding(
+                                      padding: EdgeInsets.all(10.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Row(
+                                            children: [
+                                              Icon(Icons.label,
+                                                  color: Colors.blue),
+                                              SizedBox(width: 5),
+                                              Text(
+                                                'Nama Pengeluaran: ${pengeluaranList[index].namaPengeluaran}',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 5),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.attach_money,
+                                                  color: Colors.green),
+                                              SizedBox(width: 5),
+                                              Text(
+                                                'Total Pengeluaran: ${pengeluaranList[index].totalPengeluaran}',
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 5),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.shopping_bag,
+                                                  color: Colors.orange),
+                                              SizedBox(width: 5),
+                                              Text(
+                                                  'Nama Barang: ${pengeluaranList[index].namaBarang}'),
+                                            ],
+                                          ),
+                                          SizedBox(height: 5),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.info,
+                                                  color: Colors.red),
+                                              SizedBox(width: 5),
+                                              Text(
+                                                  'Status: ${pengeluaranList[index].status}'),
+                                            ],
+                                          ),
+                                          SizedBox(height: 5),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.date_range,
+                                                  color: Colors.purple),
+                                              SizedBox(width: 5),
+                                              Text(
+                                                  '${DateFormat('dd MMM yyyy').format(DateTime.parse(pengeluaranList[index].createdAt))}'),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
                             actions: <Widget>[
                               TextButton(
                                 onPressed: () => Navigator.of(context).pop(),
-                                child: Text('OK'),
+                                child: Text('OK',
+                                    style: TextStyle(color: Colors.red)),
                               ),
                             ],
                           );
@@ -339,6 +775,13 @@ class _HomeState extends State<Home> {
                     child: Card(
                       child: ListTile(
                         title: Text(pengeluaranList[index].namaPengeluaran),
+                        subtitle: Row(
+                          children: [
+                            SizedBox(width: 5),
+                            Text(
+                                ' ${DateFormat('dd MMM yyyy').format(DateTime.parse(pengeluaranList[index].createdAt))}'),
+                          ],
+                        ),
                         trailing: Text(
                           "- ${pengeluaranList[index].totalPengeluaran.toString()}",
                           style: TextStyle(
@@ -422,8 +865,6 @@ class _HomeState extends State<Home> {
     return months[monthNumber - 1];
   }
 
-// Class untuk Halaman Detail Kategori
-
   void _showDialogDetail(BuildContext context, String title, String message) {
     showDialog(
       context: context,
@@ -442,11 +883,5 @@ class _HomeState extends State<Home> {
         );
       },
     );
-  }
-
-  void main() {
-    runApp(MaterialApp(
-      home: Home(),
-    ));
   }
 }

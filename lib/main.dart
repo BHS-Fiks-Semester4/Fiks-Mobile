@@ -250,7 +250,7 @@ class _LoginPageState extends State<LoginPage> {
         QuickAlert.show(
           context: context,
           type: QuickAlertType.warning,
-          text: 'Email or Password is incorrect',
+          text: 'Email or Password is incorrectaa',
         );
       }
     } catch (e) {

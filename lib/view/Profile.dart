@@ -7,10 +7,9 @@ import 'dart:typed_data';
 import 'package:mobile/view/DatabaseHelper.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 
 class Profile extends StatefulWidget {
-  
   final User user;
 
   const Profile({Key? key, required this.user}) : super(key: key);
@@ -27,7 +26,6 @@ class _ProfileState extends State<Profile> {
     super.initState();
     _currentUser = widget.user;
     _loadUserData();
-    
   }
 
   Future<void> _loadUserData() async {
@@ -61,26 +59,41 @@ class _ProfileState extends State<Profile> {
                     //       ? MemoryImage(base64Decode(_currentUser.foto!)!)
                     //       : AssetImage('assets/logo.png'),
                     // ),
-                    Image.memory(
-                      base64Decode(_currentUser.foto.toString()),
+                    Container(
                       width: 150,
                       height: 150,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(Icons.image, size: 150);
-                      },
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: () {
-                          // Implement edit profile picture functionality
-                        },
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: const Color.fromARGB(255, 0, 0,
+                              0), // Ganti dengan warna border yang diinginkan
+                          width:
+                              3, // Ganti dengan ketebalan border yang diinginkan
+                        ),
+                      ),
+                      child: ClipOval(
+                        child: Image.memory(
+                          base64Decode(_currentUser.foto.toString()),
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(Icons.image, size: 100);
+                          },
+                        ),
                       ),
                     ),
                   ],
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.fromLTRB(0, 7, 0, 9),
+                child: Text(
+                  '${_currentUser.name}',
+                  style: GoogleFonts.getFont(
+                    'Inter',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 22,
+                    color: Color.fromARGB(255, 0, 0, 0),
+                  ),
                 ),
               ),
               SizedBox(height: 20),

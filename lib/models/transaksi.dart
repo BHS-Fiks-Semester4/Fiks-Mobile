@@ -21,7 +21,8 @@ class Transaksi {
 
   factory Transaksi.fromJson(Map<String, dynamic> json) {
     var list = json['detail_transaksi'] as List;
-    List<DetailTransaksi> detailTransaksiList = list.map((i) => DetailTransaksi.fromJson(i)).toList();
+    List<DetailTransaksi> detailTransaksiList =
+        list.map((i) => DetailTransaksi.fromJson(i)).toList();
     return Transaksi(
       id: json['id'],
       idKaryawan: json['id_karyawan'],

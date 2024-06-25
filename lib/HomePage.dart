@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> {
   Widget _getBody() {
     switch (_currentIndex) {
       case 0:
-        return Home();
+        return Home(user: widget.homePage,);
       case 1:
         return Transaction(
           currentUser: widget.homePage,
@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
         return Profile(user: widget.homePage);
 
       default:
-        return Home();
+        return Home(user: widget.homePage,);
     }
   }
 
