@@ -40,7 +40,8 @@ class _BarangTransaksiState extends State<BarangTransaksi> {
         if (keranjang[barang]! < barang.stokBarang) {
           keranjang[barang] = keranjang[barang]! + 1;
           jumlahBarang++;
-          totalHarga += barang.hargaSetelahDiskonBarang;
+          totalHarga += barang.hargaSetelahDiskonBarang ?? 0;
+
         } else {
           // Jika jumlah yang ditambahkan melebihi stok, tampilkan pesan atau lakukan tindakan lain
           print("Stok barang ${barang.namaBarang} sudah habis.");
@@ -48,7 +49,7 @@ class _BarangTransaksiState extends State<BarangTransaksi> {
       } else {
         keranjang[barang] = 1;
         jumlahBarang++;
-        totalHarga += barang.hargaSetelahDiskonBarang;
+        totalHarga += barang.hargaSetelahDiskonBarang ?? 0;
       }
     });
   }
@@ -63,7 +64,7 @@ class _BarangTransaksiState extends State<BarangTransaksi> {
           keranjang.remove(barang);
         }
         jumlahBarang--;
-        totalHarga -= barang.hargaSetelahDiskonBarang;
+        totalHarga -= barang.hargaSetelahDiskonBarang ?? 0;
       });
     }
   }
@@ -94,7 +95,8 @@ class _BarangTransaksiState extends State<BarangTransaksi> {
   keranjang.forEach((barang, qty) {
     if (qty > 0) {
       // Assuming hargaSetelahDiskonBarang is a property of Barang that holds the price after discount
-      double subtotal = barang.hargaSetelahDiskonBarang .toDouble()* qty;
+      // double subtotal = barang.hargaSetelahDiskonBarang .toDouble()* qty;
+      double subtotal = (barang.hargaSetelahDiskonBarang ?? 0).toDouble() * qty;
       subTotalMap[barang] = subtotal;
     }
   });
@@ -159,7 +161,8 @@ class _BarangTransaksiState extends State<BarangTransaksi> {
                               SizedBox(
                                 width: 78.8,
                                 child: Text(
-                                  'Rp. ${barang.hargaSetelahDiskonBarang.toStringAsFixed(2)}',
+                                  // 'Rp. ${barang.hargaSetelahDiskonBarang.toStringAsFixed(2)}',
+                                  'Rp. ${((barang.hargaSetelahDiskonBarang ?? 0)).toStringAsFixed(2)}',
                                   style: GoogleFonts.getFont(
                                     'Inria Sans',
                                     fontWeight: FontWeight.w700,

@@ -5,6 +5,7 @@ class LayananService {
   String namaCustomer;
   String noHpCustomer;
   String alamatCustomer;
+  String namaService;
   int? idJenisService;
   String statusService;
   int? totalBayarService;
@@ -19,6 +20,7 @@ class LayananService {
     required this.namaCustomer,
     required this.noHpCustomer,
     required this.alamatCustomer,
+    required this.namaService,
     this.idJenisService,
     required this.statusService,
     this.totalBayarService,
@@ -34,6 +36,7 @@ class LayananService {
         namaCustomer: json["nama_customer"],
         noHpCustomer: json["no_hp_customer"],
         alamatCustomer: json["alamat_customer"],
+        namaService: json["nama_service"],
         idJenisService: json["id_jenis_service"],
         statusService: json["status_service"],
         totalBayarService: json["total_bayar_service"],
@@ -51,6 +54,7 @@ class LayananService {
         "nama_customer": namaCustomer,
         "no_hp_customer": noHpCustomer,
         "alamat_customer": alamatCustomer,
+        "nama_service": namaService,
         "id_jenis_service": idJenisService,
         "status_service": statusService,
         "total_bayar_service": totalBayarService,

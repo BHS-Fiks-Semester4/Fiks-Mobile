@@ -1,81 +1,86 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:mobile/models/service_model/LayananService.dart';
-import 'package:mobile/models/Kategori.dart';
+  import 'dart:convert';
+  import 'package:http/http.dart' as http;
+  import 'package:mobile/models/service_model/Service.dart';
+  import 'package:mobile/models/service_model/LayananService.dart';
 
-class ApiService{
-  final String baseUrl;
+  class ApiService{
+    final String baseUrl;
 
-  ApiService({required this.baseUrl});
+    ApiService({required this.baseUrl});
 
 
-  Future<List<LayananService>> getLayananServiceList() async {
-    final response = await http.get(Uri.parse('$baseUrl/layanan_service'));
+    Future<List<LayananService>> getPendingServices() async {
+      final response = await http.get(Uri.parse('$baseUrl/pending'));
 
-    if (response.statusCode == 200) {
-      List jsonResponse = json.decode(response.body);
-      return jsonResponse.map((data) => LayananService.fromJson(data)).toList();
-    } else {
-      throw Exception('Failed to load layanan service');
+      if (response.statusCode == 200) {
+        dynamic jsonResponse = json.decode(response.body);
+        List<dynamic> servicesJson = jsonResponse['pendings'];
+        return servicesJson.map((data) => LayananService.fromJson(data)).toList();
+      } else {
+        throw Exception('Failed to load pending services');
+      }
+    }
+
+    Future<List<LayananService>> getInProgressServices() async {
+      final response = await http.get(Uri.parse('$baseUrl/in_progress'));
+
+      if (response.statusCode == 200) {
+        dynamic jsonResponse = json.decode(response.body);
+        List<dynamic> servicesJson = jsonResponse['in_progress'];
+        return servicesJson.map((data) => LayananService.fromJson(data)).toList();
+      } else {
+        throw Exception('Failed to load pending services');
+      }
+    }
+
+    Future<List<LayananService>> getDoneUnpaidServices() async {
+      final response = await http.get(Uri.parse('$baseUrl/done_unpaid'));
+
+      if (response.statusCode == 200) {
+        dynamic jsonResponse = json.decode(response.body);
+        List<dynamic> servicesJson = jsonResponse['done_unpaids'];
+        return servicesJson.map((data) => LayananService.fromJson(data)).toList();
+      } else {
+        throw Exception('Failed to load pending services');
+      }
+    }
+
+    Future<List<LayananService>> getDonePaidServices() async {
+      final response = await http.get(Uri.parse('$baseUrl/done_paid'));
+
+      if (response.statusCode == 200) {
+        dynamic jsonResponse = json.decode(response.body);
+        List<dynamic> servicesJson = jsonResponse['done_paids'];
+        return servicesJson.map((data) => LayananService.fromJson(data)).toList();
+      } else {
+        throw Exception('Failed to load pending services');
+      }
+    }
+
+
+    Future<List<Service>> getKategoriList() async {
+      final response = await http.get(Uri.parse('$baseUrl/create'));
+
+      if (response.statusCode == 200) {
+        List jsonResponse = json.decode(response.body)['kategoris'];
+        return jsonResponse.map((data) => Service.fromJson(data)).toList();
+      } else {
+        throw Exception('Failed to load kategori');
+      }
+    }
+
+
+    Future<void> createLayananService(LayananService layananService) async {
+      final url = Uri.parse('$baseUrl');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(layananService.toJson()),
+      );
+
+      if (response.statusCode != 201) {
+        throw Exception('Failed to create layanan service');
+      }
     }
   }
 
-
-  Future<LayananService> getLayananServiceDetail(int id) async {
-    final response = await http.get(Uri.parse('$baseUrl/layanan_service/$id'));
-
-    if (response.statusCode == 200) {
-      return LayananService.fromJson(json.decode(response.body));
-    } else {
-      throw Exception('Failed to load layanan service detail');
-    }
-  }
-
-
-  Future<void> getLayananService(LayananService layananService) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/layanan_service'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(layananService.toJson()),
-    );
-
-    if (response.statusCode != 201) {
-      throw Exception('Failed to add layanan service');
-    }
-  }
-
-
-  Future<void> updateLayananService(int id, LayananService layananService) async {
-    final response = await http.put(
-      Uri.parse('$baseUrl/layanan_service/$id'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(layananService.toJson()),
-    );
-
-    if (response.statusCode != 200) {
-      throw Exception('Failed to update layanan service');
-    }
-  }
-
-
-  Future<void> deleteLayananService(int id) async {
-    final response = await http.delete(Uri.parse('$baseUrl/layanan_service/$id'));
-
-    if (response.statusCode != 200) {
-      throw Exception('Failed to delete layanan service');
-    }
-  }
-
-
-  Future<List<Kategori>> getKategoriList() async {
-    final response = await http.get(Uri.parse('$baseUrl/create'));
-
-    if (response.statusCode == 200) {
-      List jsonResponse = json.decode(response.body);
-      return jsonResponse.map((data) => Kategori.fromJson(data)).toList();
-    } else {
-      throw Exception('Failed to load kategori');
-    }
-  }
-
-}

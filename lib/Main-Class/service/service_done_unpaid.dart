@@ -1,26 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/Main-Class/navigate.dart';
 
-class ServiceOnProgressPage extends StatefulWidget {
-  const ServiceOnProgressPage({super.key});
+class ServiceDoneUnpaidPage extends StatefulWidget {
+  const ServiceDoneUnpaidPage({super.key});
 
   @override
-  State<ServiceOnProgressPage> createState() => _ServiceOnProgressPageState();
+  State<ServiceDoneUnpaidPage> createState() => _ServiceDoneUnpaidPageState();
 }
 
-class _ServiceOnProgressPageState extends State<ServiceOnProgressPage> {
+class _ServiceDoneUnpaidPageState extends State<ServiceDoneUnpaidPage> {
   final TextEditingController _searchController = TextEditingController();
 
   // Sample data
-  List<Map<String, String>> onProgressServices = [
+  List<Map<String, String>> doneServices = [
     {'name': 'Service 1', 'type': 'Type A', 'date': '2023-06-05'},
     {'name': 'Service 2', 'type': 'Type B', 'date': '2023-06-06'},
     {'name': 'Service 3', 'type': 'Type C', 'date': '2023-06-07'},
     {'name': 'Service 4', 'type': 'Type D', 'date': '2023-06-08'},
     {'name': 'Service 5', 'type': 'Type E', 'date': '2023-06-05'},
-    {'name': 'Service 6', 'type': 'Type F', 'date': '2023-06-06'},
-    {'name': 'Service 7', 'type': 'Type G', 'date': '2023-06-07'},
-    {'name': 'Service 8', 'type': 'Type H', 'date': '2023-06-08'},
+
   ];
 
   @override
@@ -41,7 +39,7 @@ class _ServiceOnProgressPageState extends State<ServiceOnProgressPage> {
                 child: TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    labelText: 'Search on progress services',
+                    labelText: 'Search done services',
                     prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
@@ -52,8 +50,8 @@ class _ServiceOnProgressPageState extends State<ServiceOnProgressPage> {
               Expanded(
                 child: ListView(
                   children: [
-                    _buildSectionHeader(title: 'On Progress'),
-                    ..._buildServiceCards(onProgressServices),
+                    _buildSectionHeader(title: 'Done Unpaid'),
+                    ..._buildServiceCards(doneServices),
                   ],
                 ),
               ),

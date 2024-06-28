@@ -61,7 +61,8 @@ class DetailKategori extends StatelessWidget {
                                       ),
                                     ),
                                     Text(
-                                      'Rp. ${barang.hargaSetelahDiskonBarang.toStringAsFixed(2)}',
+                                      // 'Rp. ${barang.hargaSetelahDiskonBarang.toStringAsFixed(2)}',
+                                      'Rp. ${((barang.hargaSetelahDiskonBarang ?? 0)).toStringAsFixed(2)}',
                                       style: TextStyle(
                                         fontSize: 16,
                                         color: Colors.black,

@@ -105,7 +105,7 @@ class StrukPage extends StatelessWidget {
                       Expanded(
                         flex: 2,
                         child: Text(
-                          'Rp. ${(barang.hargaSetelahDiskonBarang * qty).toStringAsFixed(2)}',
+                          'Rp. ${((barang.hargaSetelahDiskonBarang ?? 0) * qty).toStringAsFixed(2)}',
                           style: GoogleFonts.getFont(
                             'Inria Sans',
                             fontWeight: FontWeight.w500,

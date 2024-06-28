@@ -6,6 +6,7 @@ import 'package:mobile/models/DataBarang.dart';
 import 'package:mobile/models/DataTransaksi.dart';
 import 'package:mobile/models/Keranjang.dart'; // Sesuaikan dengan path proyek Anda
 import 'package:http/http.dart' as http;
+import 'package:mobile/view/BarangTransaksi.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart'; // Import provider
 
@@ -70,7 +71,8 @@ class _TransaksiPageState extends State<TransaksiPage> {
     // Menghitung total harga berdasarkan jumlah barang
     double totalHarga = 0;
     widget.barangQtyMap.forEach((barang, qty) {
-      totalHarga += barang.hargaSetelahDiskonBarang * qty;
+      totalHarga += (barang.hargaSetelahDiskonBarang ?? 0) * qty;
+      // 'Rp. ${((barang.hargaSetelahDiskonBarang ?? 0) * qty).toStringAsFixed(2)}',
     });
     
 
@@ -257,7 +259,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                         ],
                       ),
                       Text(
-                        'Rp. ${(barang.hargaSetelahDiskonBarang * widget.barangQtyMap[barang]!).toStringAsFixed(2)}',
+                        'Rp. ${((barang.hargaSetelahDiskonBarang ?? 0) * widget.barangQtyMap[barang]!).toStringAsFixed(2)}',
                         style: GoogleFonts.getFont(
                           'Inria Sans',
                           fontWeight: FontWeight.w700,

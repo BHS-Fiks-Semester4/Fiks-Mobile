@@ -3,21 +3,21 @@ import 'dart:convert';
 class Barang {
   final int id;
   final int idJenisBarang;
-  final int idSupplier;
+  final int? idSupplier;
   final String namaBarang;
   final int stokBarang;
   final int hargaBeliBarang;
   final int hargaSebelumDiskonBarang;
-  final int diskonBarang;
-  final int hargaSetelahDiskonBarang;
-  final String expDiskonBarang;
+  final int? diskonBarang;
+  final int? hargaSetelahDiskonBarang;
+  final String? expDiskonBarang;
   final String? garansiBarang;
   final String deskripsiBarang;
   final String fotoBarang; // Mengubah menjadi String untuk menyimpan base64 string
   final String status;
   final String? createdAt;
   final String? updatedAt;
-  final int jumlah; // Menambahkan bidang jumlah
+
 
   Barang({
     required this.id,
@@ -27,16 +27,16 @@ class Barang {
     required this.stokBarang,
     required this.hargaBeliBarang,
     required this.hargaSebelumDiskonBarang,
-    required this.diskonBarang,
-    required this.hargaSetelahDiskonBarang,
-    required this.expDiskonBarang,
+    this.diskonBarang,
+    this.hargaSetelahDiskonBarang,
+    this.expDiskonBarang,
     this.garansiBarang,
     required this.deskripsiBarang,
     required this.fotoBarang,
     required this.status,
     this.createdAt,
     this.updatedAt,
-    this.jumlah = 0, // Menginisialisasi jumlah dengan 0
+
   });
 
   factory Barang.fromJson(Map<String, dynamic> json) {
