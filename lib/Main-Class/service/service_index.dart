@@ -98,13 +98,18 @@ class _ServiceIndexPageState extends State<ServiceIndexPage> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => navigateToCreateService(context),
-        tooltip: 'Add Service',
-        backgroundColor: Colors.pink,
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.add),
+      floatingActionButton: SizedBox(
+        width: 40,
+        height: 40,
+        child: FloatingActionButton(
+          onPressed: () => navigateToCreateService(context),
+          tooltip: 'Add Service',
+          backgroundColor: Colors.pink,
+          foregroundColor: Colors.white,
+          child: const Icon(Icons.add, size: 20),
+        ),
       ),
+      floatingActionButtonLocation: CustomFloatingActionButtonLocation(),
     );
   }
 
@@ -205,3 +210,11 @@ class _ServiceIndexPageState extends State<ServiceIndexPage> {
     }).toList();
   }
 
+class CustomFloatingActionButtonLocation extends FloatingActionButtonLocation {
+  @override
+  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
+    final double fabX = scaffoldGeometry.scaffoldSize.width - 56.0 - 16.0;
+    final double fabY = scaffoldGeometry.scaffoldSize.height - 80.0 - 56.0;
+    return Offset(fabX, fabY);
+  }
+}

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/Main-Class/navigate.dart';
+import 'package:mobile/models/service_model/LayananService.dart';
+import 'package:mobile/Main-Class/api_service/ApiForService.dart';
 
 class ServiceDonePaidPage extends StatefulWidget {
   const ServiceDonePaidPage({super.key});
@@ -9,24 +11,34 @@ class ServiceDonePaidPage extends StatefulWidget {
 }
 
 class _ServiceDonePaidPageState extends State<ServiceDonePaidPage> {
-  final TextEditingController _searchController = TextEditingController();
+final TextEditingController _searchController = TextEditingController();
 
-  // Sample data
-  List<Map<String, String>> doneServices = [
-    {'name': 'Service 1', 'type': 'Type A', 'date': '2023-06-05'},
-    {'name': 'Service 2', 'type': 'Type B', 'date': '2023-06-06'},
-    {'name': 'Service 3', 'type': 'Type C', 'date': '2023-06-07'},
-    {'name': 'Service 4', 'type': 'Type D', 'date': '2023-06-08'},
-    {'name': 'Service 5', 'type': 'Type E', 'date': '2023-06-05'},
+  final ApiService apiService = ApiService(baseUrl: 'http://127.0.0.1:8000/api/layanan_service');
 
-  ];
+  List<LayananService> donePaidServices = [];
+
+  void initState() {
+      super.initState();
+      fetchServices();
+    }
+
+  Future<void> fetchServices() async {
+    try {
+      donePaidServices = await apiService.getDoneUnpaidServicesAll();
+      setState(() {
+
+      });
+    } catch (e) {
+      print('Error fetching services: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('Service'),
+        title: const Text('Service Done Paid'),
       ),
       body: Center(
         child: Padding(
@@ -39,7 +51,7 @@ class _ServiceDonePaidPageState extends State<ServiceDonePaidPage> {
                 child: TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    labelText: 'Search done services',
+                    labelText: 'Search service done paid',
                     prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
@@ -50,8 +62,7 @@ class _ServiceDonePaidPageState extends State<ServiceDonePaidPage> {
               Expanded(
                 child: ListView(
                   children: [
-                    _buildSectionHeader(title: 'Done Paid'),
-                    ..._buildServiceCards(doneServices),
+                    ..._buildPaidServiceCards(donePaidServices),
                   ],
                 ),
               ),
@@ -59,27 +70,11 @@ class _ServiceDonePaidPageState extends State<ServiceDonePaidPage> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => navigateToCreateService(context),
-        tooltip: 'Add Service',
-        backgroundColor: Colors.pink,
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.add),
-      ),
     );
   }
 
-  Widget _buildSectionHeader({required String title}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: Text(
-        title,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  List<Widget> _buildServiceCards(List<Map<String, String>> services) {
+}
+  List<Widget> _buildPaidServiceCards(List<LayananService> services) {
     return services.map((service) {
       return Center(
         child: Container(
@@ -87,12 +82,13 @@ class _ServiceDonePaidPageState extends State<ServiceDonePaidPage> {
           child: Card(
             margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             child: ListTile(
-              title: Text(service['name'] ?? ''),
+              title: Text(service.namaService ?? ''),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Type: ${service['type']}'),
-                  Text('Date: ${service['date']}'),
+                  Text('Customer: ${service.namaCustomer ?? ''}'),
+                  Text('No hp customer: ${service.noHpCustomer ?? ''}'),
+                  Text('Tanggal selesai: ${service.tanggalSelesai.toString()}'),
                 ],
               ),
             ),
@@ -101,4 +97,4 @@ class _ServiceDonePaidPageState extends State<ServiceDonePaidPage> {
       );
     }).toList();
   }
-}
+

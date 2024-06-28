@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/Main-Class/navigate.dart';
+import 'package:mobile/models/service_model/LayananService.dart';
+import 'package:mobile/Main-Class/api_service/ApiForService.dart';
 
 class ServicePendingPage extends StatefulWidget {
   const ServicePendingPage({super.key});
@@ -11,22 +13,32 @@ class ServicePendingPage extends StatefulWidget {
 class _ServicePendingPageState extends State<ServicePendingPage> {
   final TextEditingController _searchController = TextEditingController();
 
-  // Sample data
-  List<Map<String, String>> pendingServices = [
-    {'name': 'Service 1', 'type': 'Type A', 'date': '2023-06-05'},
-    {'name': 'Service 2', 'type': 'Type B', 'date': '2023-06-06'},
-    {'name': 'Service 3', 'type': 'Type C', 'date': '2023-06-07'},
-    {'name': 'Service 4', 'type': 'Type D', 'date': '2023-06-08'},
-    {'name': 'Service 5', 'type': 'Type E', 'date': '2023-06-05'},
+  final ApiService apiService = ApiService(baseUrl: 'http://127.0.0.1:8000/api/layanan_service');
 
-  ];
+  List<LayananService> pendingServices = [];
 
-  @override
+  void initState() {
+      super.initState();
+      fetchServices();
+    }
+
+  Future<void> fetchServices() async {
+    try {
+      pendingServices = await apiService.getPendingServicesAll();
+      setState(() {
+
+      });
+    } catch (e) {
+      print('Error fetching services: $e');
+    }
+  }
+
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('Service'),
+        title: const Text('Service Pending'),
       ),
       body: Center(
         child: Padding(
@@ -39,7 +51,7 @@ class _ServicePendingPageState extends State<ServicePendingPage> {
                 child: TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    labelText: 'Search pending services',
+                    labelText: 'Search service pending',
                     prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
@@ -50,8 +62,7 @@ class _ServicePendingPageState extends State<ServicePendingPage> {
               Expanded(
                 child: ListView(
                   children: [
-                    _buildSectionHeader(title: 'Pending'),
-                    ..._buildServiceCards(pendingServices),
+                    ..._buildPendingInProgressServiceCards(pendingServices),
                   ],
                 ),
               ),
@@ -59,27 +70,11 @@ class _ServicePendingPageState extends State<ServicePendingPage> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => navigateToCreateService(context),
-        tooltip: 'Add Service',
-        backgroundColor: Colors.pink,
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.add),
-      ),
     );
   }
 
-  Widget _buildSectionHeader({required String title}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: Text(
-        title,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  List<Widget> _buildServiceCards(List<Map<String, String>> services) {
+}
+  List<Widget> _buildPendingInProgressServiceCards(List<LayananService> services) {
     return services.map((service) {
       return Center(
         child: Container(
@@ -87,12 +82,13 @@ class _ServicePendingPageState extends State<ServicePendingPage> {
           child: Card(
             margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             child: ListTile(
-              title: Text(service['name'] ?? ''),
+              title: Text(service.namaService, style: TextStyle(fontWeight:FontWeight.bold)),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Type: ${service['type']}'),
-                  Text('Date: ${service['date']}'),
+                  Text('Customer: ${service.namaCustomer ?? ''}'),
+                  Text('Jenis service: ${service.idJenisService}'), 
+                  Text('Tanggal penerimaan: ${service.tanggalPenerimaan}'), 
                 ],
               ),
             ),
@@ -100,5 +96,4 @@ class _ServicePendingPageState extends State<ServicePendingPage> {
         ),
       );
     }).toList();
-  }
 }
