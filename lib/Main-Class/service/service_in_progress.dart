@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/Main-Class/navigate.dart';
 
-class ServiceDonePage extends StatefulWidget {
-  const ServiceDonePage({super.key});
+class ServiceInProgressPage extends StatefulWidget {
+  const ServiceInProgressPage({super.key});
 
   @override
-  State<ServiceDonePage> createState() => _ServiceDonePageState();
+  State<ServiceInProgressPage> createState() => _ServiceInProgressPageState();
 }
 
-class _ServiceDonePageState extends State<ServiceDonePage> {
+class _ServiceInProgressPageState extends State<ServiceInProgressPage> {
   final TextEditingController _searchController = TextEditingController();
 
   // Sample data
-  List<Map<String, String>> doneServices = [
+  List<Map<String, String>> onProgressServices = [
     {'name': 'Service 1', 'type': 'Type A', 'date': '2023-06-05'},
     {'name': 'Service 2', 'type': 'Type B', 'date': '2023-06-06'},
     {'name': 'Service 3', 'type': 'Type C', 'date': '2023-06-07'},
     {'name': 'Service 4', 'type': 'Type D', 'date': '2023-06-08'},
     {'name': 'Service 5', 'type': 'Type E', 'date': '2023-06-05'},
-
+    {'name': 'Service 6', 'type': 'Type F', 'date': '2023-06-06'},
+    {'name': 'Service 7', 'type': 'Type G', 'date': '2023-06-07'},
+    {'name': 'Service 8', 'type': 'Type H', 'date': '2023-06-08'},
   ];
 
   @override
@@ -39,7 +41,7 @@ class _ServiceDonePageState extends State<ServiceDonePage> {
                 child: TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    labelText: 'Search done services',
+                    labelText: 'Search on progress services',
                     prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
@@ -50,8 +52,8 @@ class _ServiceDonePageState extends State<ServiceDonePage> {
               Expanded(
                 child: ListView(
                   children: [
-                    _buildSectionHeader(title: 'Done'),
-                    ..._buildServiceCards(doneServices),
+                    _buildSectionHeader(title: 'On Progress'),
+                    ..._buildServiceCards(onProgressServices),
                   ],
                 ),
               ),

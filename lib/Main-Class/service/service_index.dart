@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:mobile/Main-Class/navigate.dart';
+import 'package:mobile/models/service_model/LayananService.dart';
+import 'package:mobile/Main-Class/api_service/ApiForService.dart';
 
 class ServiceIndexPage extends StatefulWidget {
   const ServiceIndexPage({super.key});
@@ -12,27 +14,33 @@ class ServiceIndexPage extends StatefulWidget {
 class _ServiceIndexPageState extends State<ServiceIndexPage> {
   final TextEditingController _searchController = TextEditingController();
 
-  // Sample data
-  List<Map<String, String>> pendingServices = [
-    {'name': 'Service 5', 'type': 'Type E', 'date': '2023-06-05'},
-    {'name': 'Service 6', 'type': 'Type F', 'date': '2023-06-06'},
-    {'name': 'Service 7', 'type': 'Type G', 'date': '2023-06-07'},
-    {'name': 'Service 8', 'type': 'Type H', 'date': '2023-06-08'},
-  ];
+  final ApiService apiService = ApiService(baseUrl: 'http://127.0.0.1:8000/api/layanan_service');
 
-  List<Map<String, String>> onProgressServices = [
-    {'name': 'Service 1', 'type': 'Type A', 'date': '2023-06-01'},
-    {'name': 'Service 2', 'type': 'Type B', 'date': '2023-06-02'},
-    {'name': 'Service 3', 'type': 'Type C', 'date': '2023-06-03'},
-    {'name': 'Service 4', 'type': 'Type D', 'date': '2023-06-04'},
-  ];
+  List<LayananService> pendingServices = [];
+  List<LayananService> inProgressServices = [];
+  List<LayananService> doneUnpaidServices = [];
+  List<LayananService> donePaidServices = [];
 
-  List<Map<String, String>> doneServices = [
-    {'name': 'Service 5', 'type': 'Type E', 'date': '2023-06-05'},
-    {'name': 'Service 6', 'type': 'Type F', 'date': '2023-06-06'},
-    {'name': 'Service 7', 'type': 'Type G', 'date': '2023-06-07'},
-    {'name': 'Service 8', 'type': 'Type H', 'date': '2023-06-08'},
-  ];
+  @override
+
+  void initState() {
+      super.initState();
+      fetchServices();
+    }
+
+  Future<void> fetchServices() async {
+    try {
+      pendingServices = await apiService.getPendingServices();
+      inProgressServices = await apiService.getInProgressServices();
+      doneUnpaidServices = await apiService.getDoneUnpaidServices();
+      donePaidServices = await apiService.getDonePaidServices();
+      setState(() {
+
+      });
+    } catch (e) {
+      print('Error fetching services: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,17 +75,22 @@ class _ServiceIndexPageState extends State<ServiceIndexPage> {
                       title: 'Pending',
                       onViewAll: () => navigateToPendingService(context),
                     ),
-                    ..._buildServiceCards(pendingServices),
+                    ..._buildPendingInProgressServiceCards(pendingServices),
                     _buildSectionHeader(
                       title: 'On Progress',
-                      onViewAll: () => navigateToOnProgressService(context),
+                      onViewAll: () => navigateToInProgressService(context),
                     ),
-                    ..._buildServiceCards(onProgressServices),
+                    ..._buildPendingInProgressServiceCards(inProgressServices),
                     _buildSectionHeader(
-                      title: 'Done',
-                      onViewAll: () => navigateToDoneService(context)
+                      title: 'Done Unpaid',
+                      onViewAll: () => navigateToDoneUnpaidService(context),
                     ),
-                    ..._buildServiceCards(doneServices),
+                    ..._buildUnpaidServiceCards(doneUnpaidServices),
+                    _buildSectionHeader(
+                      title: 'Done Paid',
+                      onViewAll: () => navigateToDonePaidService(context),
+                    ),
+                    ..._buildPaidServiceCards(donePaidServices),
                   ],
                 ),
               ),
@@ -120,7 +133,8 @@ class _ServiceIndexPageState extends State<ServiceIndexPage> {
     );
   }
 
-  List<Widget> _buildServiceCards(List<Map<String, String>> services) {
+}
+  List<Widget> _buildPendingInProgressServiceCards(List<LayananService> services) {
     return services.map((service) {
       return Center(
         child: Container(
@@ -128,12 +142,13 @@ class _ServiceIndexPageState extends State<ServiceIndexPage> {
           child: Card(
             margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             child: ListTile(
-              title: Text(service['name'] ?? ''),
+              title: Text(service.namaService, style: TextStyle(fontWeight:FontWeight.bold)),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Type: ${service['type']}'),
-                  Text('Date: ${service['date']}'),
+                  Text('Customer: ${service.namaCustomer ?? ''}'),
+                  Text('Jenis service: ${service.idJenisService}'), 
+                  Text('Tanggal penerimaan: ${service.tanggalPenerimaan}'), 
                 ],
               ),
             ),
@@ -142,4 +157,51 @@ class _ServiceIndexPageState extends State<ServiceIndexPage> {
       );
     }).toList();
   }
-}
+  List<Widget> _buildUnpaidServiceCards(List<LayananService> services) {
+    return services.map((service) {
+      return Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Card(
+            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            child: ListTile(
+              title: Text(service.namaService ?? ''),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Customer: ${service.namaCustomer ?? ''}'),
+                  Text('No hp customer: ${service.noHpCustomer ?? ''}'),
+                  Text('Tanggal penerimaan: ${service.tanggalPenerimaan.toString()}'),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }).toList();
+  }
+
+  List<Widget> _buildPaidServiceCards(List<LayananService> services) {
+    return services.map((service) {
+      return Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Card(
+            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            child: ListTile(
+              title: Text(service.namaService ?? ''),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Customer: ${service.namaCustomer ?? ''}'),
+                  Text('No hp customer: ${service.noHpCustomer ?? ''}'),
+                  Text('Tanggal selesai: ${service.tanggalSelesai.toString()}'),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }).toList();
+  }
+

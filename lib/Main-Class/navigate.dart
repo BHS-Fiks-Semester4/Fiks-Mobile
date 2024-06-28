@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'service/service_index.dart';
 import 'service/service_create.dart';
 import 'service/service_pending.dart';
-import 'service/service_on_progress.dart';
-import 'service/service_done.dart';
+import 'service/service_in_progress.dart';
+import 'service/service_done_unpaid.dart';
+import 'service/service_done_paid.dart';
 
 void navigateToServicePage(BuildContext context) {
   Navigator.push(
@@ -26,16 +27,23 @@ void navigateToPendingService(BuildContext context){
   );
 }
 
-void navigateToOnProgressService(BuildContext context){
+void navigateToInProgressService(BuildContext context){
   Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => const ServiceOnProgressPage())  
+    MaterialPageRoute(builder: (context) => const ServiceInProgressPage())  
   );
 }
 
-void navigateToDoneService(BuildContext context){
+void navigateToDoneUnpaidService(BuildContext context){
   Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => const ServiceDonePage())  
+    MaterialPageRoute(builder: (context) => const ServiceDoneUnpaidPage())  
+  );
+}
+
+void navigateToDonePaidService(BuildContext context){
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const ServiceDonePaidPage())  
   );
 }

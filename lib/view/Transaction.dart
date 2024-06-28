@@ -21,7 +21,15 @@ class _TransactionState extends State<Transaction> {
     final response =
         await http.get(Uri.parse('http://127.0.0.1:8000/api/data_barang'));
 
-    if (response.statusCode == 200) {
+    // if (response.statusCode == 200) {
+    //   setState(() {
+    //     _listBarang = Barang.parseBarangs(response.body);
+    //     print(_listBarang.length);
+    //   });
+    // } else {
+    //   throw Exception('Failed to load barangs');
+    // }
+    if (mounted) {
       setState(() {
         _listBarang = Barang.parseBarangs(response.body);
         print(_listBarang.length);

@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/Main-Class/api_service/ApiForService.dart';
+import 'package:mobile/models/service_model/Service.dart';
+import 'package:mobile/models/service_model/LayananService.dart';
+import 'package:mobile/Main-Class/service/service_index.dart';
 
 class ServiceCreatePage extends StatefulWidget {
   const ServiceCreatePage({super.key});
@@ -14,17 +18,69 @@ class _ServiceCreatePageState extends State<ServiceCreatePage> {
   final TextEditingController _alamatCustomerController = TextEditingController();
   final TextEditingController _namaServiceController = TextEditingController();
   final TextEditingController tanggalService = TextEditingController();
-  String _selectedJenisService = 'laptop'; // Default jenis service
-  String _selectedStatusService = 'pending'; // Default status service
-  DateTime _selectedDate = DateTime.now(); // Default tanggal service
+  String _selectedJenisService = 'null'; 
+  String _selectedStatusService = 'pending'; 
+  DateTime _selectedDate = DateTime.now();
 
-  // Dropdown menu items for jenis service
-  final List<String> _jenisServiceItems = ['laptop', 'computer', 'perangkat lain'];
+  // Dropdown menu items untuk status service
+  final List<String> _statusServiceItems = ['pending', 'in_progress'];
 
-  // Dropdown menu items for status service
-  final List<String> _statusServiceItems = ['pending', 'in progress'];
+  List<Service> _kategoriList = [];
+  bool _isLoading = true;
 
   @override
+    void initState() {
+    super.initState();
+    _fetchKategoriList();
+  }
+
+  Future<void> _fetchKategoriList() async {
+    ApiService apiService = ApiService(baseUrl: 'http://127.0.0.1:8000/api/layanan_service');
+    try {
+      List<Service> kategoriList = await apiService.getKategoriList();
+      setState(() {
+        _kategoriList = kategoriList;
+        _kategoriList.insert(0, Service(id: 0, namaService: 'Pilih jenis service', deskripsiService: '', foto: null, status: '', createdAt: DateTime.now(), updatedAt: DateTime.now()));
+        _selectedJenisService = _kategoriList.first.namaService;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _createService() async {
+    if (formKey.currentState!.validate()) {
+      int? idJenisService = _selectedJenisService == 'Pilih jenis service'
+          ? null
+          : _kategoriList.firstWhere((service) => service.namaService == _selectedJenisService).id;
+
+      final layananService = LayananService(
+        namaCustomer: _namaCustomerController.text,
+        noHpCustomer: _noHpCustomerController.text,
+        alamatCustomer: _alamatCustomerController.text,
+        namaService: _namaServiceController.text,
+        idJenisService: idJenisService,
+        statusService: _selectedStatusService,
+        statusBayar: 'belum',
+        tanggalPenerimaan: _selectedDate,
+      );
+
+      try {
+        ApiService apiService = ApiService(baseUrl: 'http://127.0.0.1:8000/api/layanan_service');
+        await apiService.createLayananService(layananService);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ServiceIndexPage()),
+          );
+      } catch (e) {
+        Text('error: $e');
+      }
+    }
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -54,7 +110,6 @@ class _ServiceCreatePageState extends State<ServiceCreatePage> {
                             return null;
                           },
                           decoration: const InputDecoration(
-                            hintText: "Masukkan nama customer",
                             labelText: "Nama lengkap customer ",
                             border: OutlineInputBorder(
                               borderRadius:
@@ -76,7 +131,6 @@ class _ServiceCreatePageState extends State<ServiceCreatePage> {
                             return null;
                           },
                           decoration: const InputDecoration(
-                            hintText: "Masukkan nomor handphone customer",
                             labelText: "Nomor handphone customer ",
                             border: OutlineInputBorder(
                               borderRadius:
@@ -98,7 +152,6 @@ class _ServiceCreatePageState extends State<ServiceCreatePage> {
                             return null;
                           },
                           decoration: const InputDecoration(
-                            hintText: "Masukkan alamat customer",
                             labelText: "Alamat customer ",
                             border: OutlineInputBorder(
                               borderRadius:
@@ -120,7 +173,6 @@ class _ServiceCreatePageState extends State<ServiceCreatePage> {
                             return null;
                           },
                           decoration: const InputDecoration(
-                            hintText: "Masukkan nama service",
                             labelText: "Nama service ",
                             border: OutlineInputBorder(
                               borderRadius:
@@ -133,26 +185,28 @@ class _ServiceCreatePageState extends State<ServiceCreatePage> {
                       Container(
                         width: 300,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                        child: DropdownButtonFormField<String>(
-                          value: _selectedJenisService,
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedJenisService = value!;
-                            });
-                          },
-                          items: _jenisServiceItems.map((String jenis) {
-                            return DropdownMenuItem<String>(
-                              value: jenis,
-                              child: Text(jenis),
-                            );
-                          }).toList(),
-                          decoration: InputDecoration(
-                            labelText: 'Jenis service',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
+                        child: _isLoading
+                            ? CircularProgressIndicator()
+                            : DropdownButtonFormField<String>(
+                                value: _selectedJenisService,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedJenisService = value!;
+                                  });
+                                },
+                                items: _kategoriList.map((Service kategori) {
+                                  return DropdownMenuItem<String>(
+                                    value: kategori.namaService,
+                                    child: Text(kategori.namaService),
+                                  );
+                                }).toList(),
+                                decoration: InputDecoration(
+                                  labelText: 'Jenis service',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
                       ),
                       SizedBox(height: 16.0),
                       Container(
@@ -197,7 +251,6 @@ class _ServiceCreatePageState extends State<ServiceCreatePage> {
                           },
                           decoration: InputDecoration(
                             labelText: 'Tanggal service',
-                            hintText: 'Pilih service',
                             suffixIcon: Icon(Icons.calendar_today),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -207,22 +260,13 @@ class _ServiceCreatePageState extends State<ServiceCreatePage> {
                       ),
                       SizedBox(height: 16.0),
                       ElevatedButton(
-                        onPressed: () {
-                          if (formKey.currentState!.validate()) {
-                            
-                          }
-                        },
+                        onPressed: _createService,
                         style: ButtonStyle(
-                            minimumSize:
-                                MaterialStateProperty.all(Size(290, 50)),
-                            backgroundColor:
-                                MaterialStateProperty.all<Color>(Colors.pink),
-                            foregroundColor:
-                                MaterialStateProperty.all<Color>(Colors.white),
-                            shape: MaterialStateProperty.all<
-                                    RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)))),
+                            minimumSize: MaterialStateProperty.all(Size(290, 50)),
+                            backgroundColor: MaterialStateProperty.all<Color>(Colors.pink),
+                            foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))),
                         child: Text(
                           'Add service',
                           style: TextStyle(
@@ -251,6 +295,7 @@ class _ServiceCreatePageState extends State<ServiceCreatePage> {
     if (pickedDate != null && pickedDate != _selectedDate) {
       setState(() {
         _selectedDate = pickedDate;
+        tanggalService.text = "${_selectedDate.toLocal()}".split(' ')[0];
       });
     }
   }
