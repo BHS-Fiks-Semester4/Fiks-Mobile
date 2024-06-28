@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:mobile/models/DataBarang.dart';
 
 class StrukPage extends StatelessWidget {
   final String transactionId;
-  final String namaCustomer;
   final String formattedDate;
   final double totalHarga;
   final double bayar;
@@ -15,7 +13,6 @@ class StrukPage extends StatelessWidget {
   const StrukPage({
     Key? key,
     required this.transactionId,
-    required this.namaCustomer,
     required this.formattedDate,
     required this.totalHarga,
     required this.bayar,
@@ -61,7 +58,6 @@ class StrukPage extends StatelessWidget {
             Divider(thickness: 2, color: Colors.black),
             SizedBox(height: 8),
             _buildInfoRow('ID Transaksi', transactionId),
-            _buildInfoRow('Nama Customer', namaCustomer),
             _buildInfoRow('Tanggal', formattedDate),
             Divider(thickness: 2, color: Colors.black),
             SizedBox(height: 16),
@@ -121,7 +117,8 @@ class StrukPage extends StatelessWidget {
               },
             ),
             Divider(thickness: 2, color: Colors.black),
-            _buildInfoRow('Total Harga', 'Rp. ${totalHarga.toStringAsFixed(2)}'),
+            _buildInfoRow(
+                'Total Harga', 'Rp. ${totalHarga.toStringAsFixed(2)}'),
             _buildInfoRow('Bayar', 'Rp. ${bayar.toStringAsFixed(2)}'),
             _buildInfoRow('Kembalian', 'Rp. ${kembalian.toStringAsFixed(2)}'),
             SizedBox(height: 16),
@@ -136,6 +133,13 @@ class StrukPage extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+              child: Text('Kembali ke Beranda'),
             ),
           ],
         ),

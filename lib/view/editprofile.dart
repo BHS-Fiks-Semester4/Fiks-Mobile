@@ -119,6 +119,7 @@ class EditProfileState extends State<EditProfile> {
                   ),
                 ),
               ),
+              
               SizedBox(height: 20),
               TextFormField(
                 controller: _nameController,

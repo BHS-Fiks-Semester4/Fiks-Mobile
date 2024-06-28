@@ -103,6 +103,7 @@ class _TransactionState extends State<Transaction> {
                     ],
                   ),
                 ),
+               
                 SizedBox(width: 20), // Add spacing between buttons
                 ElevatedButton(
                   onPressed: () {
