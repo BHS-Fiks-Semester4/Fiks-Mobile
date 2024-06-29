@@ -58,6 +58,55 @@
     }
 
 
+    Future<List<LayananService>> getPendingServicesAll() async {
+      final response = await http.get(Uri.parse('$baseUrl/pending_all'));
+
+      if (response.statusCode == 200) {
+        dynamic jsonResponse = json.decode(response.body);
+        List<dynamic> servicesJson = jsonResponse['pendings'];
+        return servicesJson.map((data) => LayananService.fromJson(data)).toList();
+      } else {
+        throw Exception('Failed to load pending services');
+      }
+    }
+
+    Future<List<LayananService>> getInProgressServicesAll() async {
+      final response = await http.get(Uri.parse('$baseUrl/in_progress_all'));
+
+      if (response.statusCode == 200) {
+        dynamic jsonResponse = json.decode(response.body);
+        List<dynamic> servicesJson = jsonResponse['in_progress'];
+        return servicesJson.map((data) => LayananService.fromJson(data)).toList();
+      } else {
+        throw Exception('Failed to load pending services');
+      }
+    }
+
+    Future<List<LayananService>> getDoneUnpaidServicesAll() async {
+      final response = await http.get(Uri.parse('$baseUrl/done_unpaid_all'));
+
+      if (response.statusCode == 200) {
+        dynamic jsonResponse = json.decode(response.body);
+        List<dynamic> servicesJson = jsonResponse['done_unpaids'];
+        return servicesJson.map((data) => LayananService.fromJson(data)).toList();
+      } else {
+        throw Exception('Failed to load pending services');
+      }
+    }
+
+    Future<List<LayananService>> getDonePaidServicesAll() async {
+      final response = await http.get(Uri.parse('$baseUrl/done_paid_all'));
+
+      if (response.statusCode == 200) {
+        dynamic jsonResponse = json.decode(response.body);
+        List<dynamic> servicesJson = jsonResponse['done_paids'];
+        return servicesJson.map((data) => LayananService.fromJson(data)).toList();
+      } else {
+        throw Exception('Failed to load pending services');
+      }
+    }
+
+
     Future<List<Service>> getKategoriList() async {
       final response = await http.get(Uri.parse('$baseUrl/create'));
 
